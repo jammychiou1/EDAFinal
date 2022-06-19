@@ -3,6 +3,7 @@
 
 #include <bits/stdc++.h>
 
+
 using namespace std;
 
 enum Type {
@@ -31,7 +32,9 @@ friend struct Out;
 //friend struct Net;
 
 public:
-    Based(const string& name, Type type, int id = 0) : name(name), id(id), type(type) {};
+    Based(const string& name, Type type, int id = 0) : name(name), id(id), type(type) {
+        ref = 0;
+    };
     virtual ~Based() {};
     void addFanin(Based*);
     void addFanout(Based*);
@@ -44,6 +47,7 @@ protected:
     GateType gateType;
     vector<Based*> fanins;
     vector<Based*> fanouts;
+    size_t ref;
 };
 
 
@@ -103,10 +107,14 @@ struct Net {
 };
 */
 
-
 class Parser {
 public:
-    Parser(){}
+    Parser() {
+        wires["1\'b0"] = new Based("1\'b0", NET);
+        wires["1\'b1"] = new Based("1\'b1", NET);
+        globalRef = 0;
+        reducedNum = 0;
+    }
     ~Parser() {
         // remember to delete pointer
     }
@@ -114,6 +122,8 @@ public:
     vector<In*> getIns() const { return inputs; }
     vector<Out*> getOut() const { return outputs; }
     void dfsFanin(Based* ptr = nullptr) const;
+
+    void strash();
 
 private:
     void process_input(string line);
@@ -133,6 +143,13 @@ private:
     map<string, Based*> outputsMap; // to quick find pointer(Based*) from name(string)
     map<string, Based*> wires;
     //vector<Based*> nets;
+
+    map<pair<vector<Based*>, int>, Based*> hash;
+    void strash_helper(Based* ptr);
+    size_t globalRef;
+    string firstLine;
+    size_t reducedNum;
+
 };
 
 #endif  // __PARSER_H__

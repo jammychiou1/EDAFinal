@@ -12,6 +12,7 @@ Parser::read(const string& path) {
         line = Parser::trim(line);
         //cout << '<' << line << '>' << '\n';
         if (line.substr(0, 6) == "module") {
+            firstLine = line;
             continue;
         }
         if (line.substr(0, 9) == "endmodule") {
@@ -305,9 +306,69 @@ Parser::dfsFanin_helper(Based* ptr, int depth) const {
     for (int i = 0; i < depth; ++i) {
         cout << " ";
     }
-    cout << ptr->name << endl;
+    if (ptr->type == GATE) {
+        cout << ptr->name << " ";
+        cout << ptr->gateType << endl;
+    }
+    else 
+        cout << ptr->name << endl;
     if (ptr->type == INPUT) 
         return;
     for (int i = 0; i < ptr->fanins.size(); ++i)
         dfsFanin_helper(ptr->fanins[i], depth+1);
 }
+
+void
+Parser::strash() {
+    globalRef ++;
+    for (auto it = inputsMap.begin(); it != inputsMap.end(); ++it) {
+        strash_helper(it->second);
+    }
+    cout << "Total reduce " << reducedNum << " equivalent gate" << endl;
+}
+
+void
+Parser::strash_helper(Based* ptr) {
+    if (ptr->ref == globalRef)
+        return;
+    ptr->ref = globalRef;
+    if (ptr->type == GATE) { 
+        if (hash.count(make_pair(ptr->fanins, ptr->gateType)) == 0) {
+            hash[make_pair(ptr->fanins, ptr->gateType)] = ptr;
+        }
+        if (hash[make_pair(ptr->fanins, ptr->gateType)] != ptr) {
+            // merge
+            cout << "redundant: " << ptr->name << endl;
+            reducedNum++;
+            Based* oldPtr = hash[make_pair(ptr->fanins, ptr->gateType)];
+            for (int i = 0; i < ptr->fanouts.size(); ++i) {
+                oldPtr->addFanout(ptr->fanouts[i]);
+                Based* outPtr = ptr->fanouts[i];
+                for (int j = 0; j < outPtr->fanins.size(); ++j) {
+                    if (outPtr->fanins[j] == ptr) {
+                        outPtr->fanins[j] = oldPtr;
+                        break;
+                    }
+                }
+            }
+            for (int i = 0; i < ptr->fanins.size(); ++i) {
+                Based* inPtr = ptr->fanins[i];
+                auto it = find(inPtr->fanouts.begin(), inPtr->fanouts.end(), ptr);
+                assert(it != inPtr->fanouts.end());
+                inPtr->fanouts.erase(it);
+            }
+        }
+        
+    }
+    for (int i = 0; i < ptr->fanouts.size(); ++i)
+        strash_helper(ptr->fanouts[i]);
+}
+/*
+size_t
+Parser::hashKey(vector<Based*> v, int type) const {
+    size_t ret = 0;
+    for (int i = 0; i < v.size(); ++i)
+        ret ^= (size_t)v[i];
+    return ret + type;
+}
+*/

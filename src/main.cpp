@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
         parser.read("release/test01/top_primitive.v");
     else
         parser.read(argv[1]);
+        /*
     vector<Out*> outputs = parser.getOut();
     for (int i = 0; i < outputs.size(); ++i) {
         for (int j = 0; j < outputs[i]->outs.size(); ++j) {
@@ -17,5 +18,7 @@ int main(int argc, char **argv) {
         }
         cout << endl;
     }
+    //*/
+    parser.strash();
     return 0;
 }
