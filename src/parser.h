@@ -3,8 +3,9 @@
 
 #include <bits/stdc++.h>
 
-
 using namespace std;
+
+typedef vector<bool> bitvec;
 
 enum Type {
     GATE,
@@ -34,15 +35,17 @@ friend struct Out;
 public:
     Based(const string& name, Type type, int id = 0) : name(name), id(id), type(type) {
         ref = 0;
+        setup_num = 0;
     };
     virtual ~Based() {};
     void addFanin(Based*);
     void addFanout(Based*);
-    string getName() const { return name;}
+    void print_structure();
 
-protected:
     string name;
     int id;
+    bitvec value;
+    int setup_num;
     Type type;
     GateType gateType;
     vector<Based*> fanins;
@@ -120,22 +123,12 @@ public:
     }
     void read(const string&);
     vector<In*> getIns() const { return inputs; }
-    vector<Out*> getOut() const { return outputs; }
+    vector<Out*> getOuts() const { return outputs; }
     void dfsFanin(Based* ptr = nullptr) const;
 
     void strash();
 
-private:
-    void process_input(string line);
-    void process_output(string line);
-    void process_wire(string line);
-    void process_gate(string line);
-    void dfsFanin_helper(Based*, int) const;
-
-    static string trim(const string&);
-    static pair<int, string> process_word_desc(string line);
-    static GateType identify_gate(string &line);
-
+protected:
     vector<In*> inputs;
     vector<Out*> outputs;
     vector<Based*> gates;
@@ -143,6 +136,19 @@ private:
     map<string, Based*> outputsMap; // to quick find pointer(Based*) from name(string)
     map<string, Based*> wires;
     //vector<Based*> nets;
+
+    void process_input(string line);
+    void process_output(string line);
+    virtual void process_wire(string line);
+    void process_gate(string line);
+    void dfsFanin_helper(Based*, int) const;
+
+    static string trim(const string&);
+    static pair<int, string> process_word_desc(string line);
+    static GateType identify_gate(string &line);
+
+    
+    
 
     map<pair<vector<Based*>, int>, Based*> hash;
     void strash_helper(Based* ptr);

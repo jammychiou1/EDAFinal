@@ -40,8 +40,8 @@ Parser::dfsFanin(Based* ptr) const {
         dfsFanin_helper(ptr, 0);
     }
     else {
-        for (int i = 0; i < outputs.size(); ++i) {
-            for (int j = 0; j < outputs[i]->outs.size(); ++j) {
+        for (size_t i = 0; i < outputs.size(); ++i) {
+            for (size_t j = 0; j < outputs[i]->outs.size(); ++j) {
                 dfsFanin_helper(outputs[i]->outs[j], 0);
             }
         }
@@ -49,7 +49,7 @@ Parser::dfsFanin(Based* ptr) const {
 }
 string
 Parser::trim(const string& s) {
-    int l = 0;
+    size_t l = 0;
     while (l < s.size()) {
         if (!isspace(s[l])) {
             break;
@@ -59,7 +59,7 @@ Parser::trim(const string& s) {
     if (l == s.size()) {
         return "";
     }
-    int r = s.size() - 1;
+    size_t r = s.size() - 1;
     while (r > l) {
         if (!isspace(s[r])) {
             break;
@@ -72,7 +72,7 @@ Parser::trim(const string& s) {
 pair<int, string> 
 Parser::process_word_desc(string line) {
     if (line[0] == '[') {
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ']') {
                 string word_desc = trim(line.substr(1, i - 1));
                 line = trim(line.substr(i + 1));
@@ -93,7 +93,7 @@ Parser::process_word_desc(string line) {
 GateType 
 Parser::identify_gate(string &line) {
     vector<string> types = {"and", "or", "nand", "nor", "not", "buf", "xor", "xnor"};   // index i is the same in enum
-    for (int i = 0; i < types.size(); ++i) {
+    for (size_t i = 0; i < types.size(); ++i) {
         int n = types[i].size();
         if (line.substr(0, n) == types[i]) {
             line = trim(line.substr(n));
@@ -113,13 +113,14 @@ Parser::process_input(string line) {
     line.push_back(',');
     string now;
     if (width == -1) {
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ',') {
                 const string name = trim(now);
                 In* in = new In(name, width);
                 //inputs.push_back({width, trim(now)});
                 inputs.push_back(in);
                 outputsMap[name] = in->ins[0];
+                wires[name] = in->ins[0];
                 now = "";
                 continue;
             }
@@ -127,14 +128,22 @@ Parser::process_input(string line) {
         }
     }
     else {
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ',') {
                 const string name = trim(now);
                 In* in = new In(name, width);
                 //inputs.push_back({width, trim(now)});
                 inputs.push_back(in);
-                for (int j = 0; j < width; ++j)
+                // cout << "input: " << name << " addr: " << in << "\n";
+                for (int j = 0; j < width; j++) {
+                    
+                }
+                for (int j = 0; j < width; ++j) {
                     inputsMap[name + "[" + to_string(j) + "]"] = in->ins[j];
+                    wires[name + "[" + to_string(j) + "]"] = in->ins[j];
+                    // cout << "name: " << name + "[" + to_string(j) + "]" << endl;
+                    // cout << "address: " << in->ins[j] << endl;
+                }
                 now = "";
                 continue;
             }
@@ -154,13 +163,14 @@ Parser::process_output(string line) {
     line.push_back(',');
     string now;
     if (width == -1) {
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ',') {
                 const string name = trim(now);
                 Out* out = new Out(name, width);    // will new Based* for width
                 //outputs.push_back({width, trim(now)});
                 outputs.push_back(out);
                 outputsMap[name] = out->outs[0];
+                wires[name] = out->outs[0];
                 now = "";
                 continue;
             }
@@ -168,14 +178,17 @@ Parser::process_output(string line) {
         }
     }
     else {
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ',') {
                 const string name = trim(now);
                 Out* out = new Out(name, width);
                 //outputs.push_back({width, trim(now)});
                 outputs.push_back(out);
-                for (int j = 0; j < width; ++j)
+                for (int j = 0; j < width; ++j) {
                     outputsMap[name + "[" + to_string(j) + "]"] = out->outs[j];
+                    wires[name + "[" + to_string(j) + "]"] = out->outs[j];
+                }
+                    
                 now = "";
                 continue;
             }
@@ -194,7 +207,7 @@ Parser::process_wire(string line) {
     line.push_back(',');
     string now;
     if (width == -1) {
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ',') {
                // wires[trim(now)].input = nullptr;
                 const string name = trim(now);
@@ -210,8 +223,10 @@ Parser::process_wire(string line) {
                 it = inputsMap.find(name);
                 if (it != inputsMap.end()) {
                     //cout << "found in inputs" << endl;
-                    it->second->addFanout(wires[now]);
+                    
+                    it->second->addFanout(wires[name]);
                     wires[name]->addFanin(it->second);
+                    
                 }
                 now = "";
                 continue;
@@ -220,7 +235,7 @@ Parser::process_wire(string line) {
         }
     }
     else {
-        for (int i = 0; i < line.size(); i++) {
+        for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ',') {
                 now = trim(now);
                 for (int j = 0; j < width; j++) {
@@ -238,8 +253,10 @@ Parser::process_wire(string line) {
                     it = inputsMap.find(name);
                     if (it != inputsMap.end()) {
                         //cout << "found in inputs" << endl;
+                        cout << "before: " << wires[name] << endl;
                         it->second->addFanout(wires[name]);
                         wires[name]->addFanin(it->second);
+                        cout << "after: " << wires[name] << endl;
                     }
                 }
                 now = "";
@@ -248,6 +265,16 @@ Parser::process_wire(string line) {
             now.push_back(line[i]);
         }
     }
+}
+
+void
+Based::print_structure() {
+    cout << "name: " << name << endl;
+    cout << "id: " << id << endl;
+    // cout << "value: " << value << endl;
+    cout << "setup_num: " << setup_num << endl;
+    cout << "fanin size: " << fanins.size() << endl;
+    cout << "fanout size: " << fanouts.size() << endl;
 }
 
 void 
@@ -268,19 +295,30 @@ Parser::process_gate(string line) {
     //Gate *gate = new Gate();
     Based* gate = new Based(name, GATE);
     gate->gateType = gateType;
-    for (int i = 0; i < line.size(); i++) {
+    for (size_t i = 0; i < line.size(); i++) {
         if (line[i] == ',') {
             now = trim(now);
             assert(wires[now] != nullptr);
+            assert(wires.find(now) != wires.end());
+            // cout << "gate: " << gate->name << ", wire: " << wires[now]->name << endl;
+            // cout << "now: " << now << endl;
             if (is_output) {
                 is_output = false;
+                // wires[now]->fanins.push_back(gate);
+                // gate->fanouts.push_back(wires[now]);
+                // cout << "before: " << wires[now] << endl;
                 wires[now]->addFanin(gate);
-                gate->addFanout(wires[now]);    //
+                gate->addFanout(wires[now]);
+                // cout << "after: " << wires[now] << endl;
                 //cout << "add fanin: " << wires[now]->getName() << " " << name << endl;
             }
             else {
+                // wires[now]->fanouts.push_back(gate);
+                // gate->fanins.push_back(wires[now]);
+                // cout << "before: " << wires[now] << endl;
                 wires[now]->addFanout(gate);
-                gate->addFanin(wires[now]); //
+                gate->addFanin(wires[now]);
+                // cout << "after: " << wires[now] << endl;
                 //cout << "add fanout: " << wires[now]->getName() << " " << name << endl;
             }
             now = "";
@@ -314,7 +352,7 @@ Parser::dfsFanin_helper(Based* ptr, int depth) const {
         cout << ptr->name << endl;
     if (ptr->type == INPUT) 
         return;
-    for (int i = 0; i < ptr->fanins.size(); ++i)
+    for (size_t i = 0; i < ptr->fanins.size(); ++i)
         dfsFanin_helper(ptr->fanins[i], depth+1);
 }
 
@@ -341,17 +379,17 @@ Parser::strash_helper(Based* ptr) {
             cout << "redundant: " << ptr->name << endl;
             reducedNum++;
             Based* oldPtr = hash[make_pair(ptr->fanins, ptr->gateType)];
-            for (int i = 0; i < ptr->fanouts.size(); ++i) {
+            for (size_t i = 0; i < ptr->fanouts.size(); ++i) {
                 oldPtr->addFanout(ptr->fanouts[i]);
                 Based* outPtr = ptr->fanouts[i];
-                for (int j = 0; j < outPtr->fanins.size(); ++j) {
+                for (size_t j = 0; j < outPtr->fanins.size(); ++j) {
                     if (outPtr->fanins[j] == ptr) {
                         outPtr->fanins[j] = oldPtr;
                         break;
                     }
                 }
             }
-            for (int i = 0; i < ptr->fanins.size(); ++i) {
+            for (size_t i = 0; i < ptr->fanins.size(); ++i) {
                 Based* inPtr = ptr->fanins[i];
                 auto it = find(inPtr->fanouts.begin(), inPtr->fanouts.end(), ptr);
                 assert(it != inPtr->fanouts.end());
@@ -360,7 +398,7 @@ Parser::strash_helper(Based* ptr) {
         }
         
     }
-    for (int i = 0; i < ptr->fanouts.size(); ++i)
+    for (size_t i = 0; i < ptr->fanouts.size(); ++i)
         strash_helper(ptr->fanouts[i]);
 }
 /*
