@@ -34,8 +34,9 @@ int main(int argc, char **argv) {
         argc < 2 ? simulator.read("release/test01/top_primitive.v") : simulator.read(argv[1]);
         simulator.generate_input();
         simulator.generate_output(simulator.input_testcase);
+        cout << "start solving..." << endl;
         auto result = solve(simulator.input_testcase, simulator.output_testcase);
-        cout << result.first << endl;
+        result.first ? cout << "solved" << endl : cout << "can't solved" << endl;
         string outPath = "out.v";
         if (result.first) convert(outPath, result.second, simulator.input_info, simulator.output_info);
     }

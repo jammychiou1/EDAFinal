@@ -30,6 +30,7 @@ Parser::read(const string& path) {
             continue;
         }
         process_gate(line);
+        gate_cnt ++;
     }
 }
 
@@ -133,9 +134,6 @@ Parser::process_input(string line) {
                 In* in = new In(name, width);
                 //inputs.push_back({width, trim(now)});
                 inputs.push_back(in);
-                for (int j = 0; j < width; j++) {
-                    
-                }
                 for (int j = 0; j < width; ++j) {
                     inputsMap[name + "[" + to_string(j) + "]"] = in->ins[j];
                     wires[name + "[" + to_string(j) + "]"] = in->ins[j];

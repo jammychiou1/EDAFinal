@@ -2,6 +2,8 @@
 
 void
 Simulator::generate_output(map<string, vector<bitvec>>& testcase) {
+    cout << "start generate output..." << endl;
+    // cout << "gate count: " << gate_cnt << endl;
     output_testcase.clear();
     int testcase_size = (int)testcase.begin()->second.size();
     queue<Based*> process;
@@ -34,11 +36,17 @@ Simulator::generate_output(map<string, vector<bitvec>>& testcase) {
     wires["1\'b1"]->value = bitvec(testcase_size, 1);
     process.push(wires["1\'b0"]);
     process.push(wires["1\'b1"]);
+    // cout << "input put into queue" << endl;
+    // ofstream debug("debug.txt");
+    // debug << "initial queue size: " << process.size() << endl;
     while (!process.empty()) {
         Based* now = process.front();
+        // debug << now->name << endl;
         process.pop();
         bitvec outValue = now->value;
+        // debug << "fanout num: " << now->fanouts.size() << endl;
         for (auto out: now->fanouts) {
+            // debug << out->name << " " << out->fanins.size() << endl;
             out->setup_num ++;
             if (out->type == NET || out->type == OUTPUT) {
                 assert(out->fanins.size() == 1);
@@ -58,14 +66,20 @@ Simulator::generate_output(map<string, vector<bitvec>>& testcase) {
                 }
             }
         }
+        // debug << "queue size: " << process.size() << endl << endl;
         now->setup_num = 0;
     }
+    // cout << "output done" << endl;
     for (Out* out: outputs) {
         string name = out->name;
         vector<bitvec> out_val;
+        // cout << name << endl;
         for (int i = 0; i < testcase_size; i++) {
             bitvec tmp;
             if (out->width == -1) {
+                // cout << out->outs.size() << endl;
+                // cout << out->outs[0]->value.size() << endl;
+                // cout << out->outs[0]->value[i] << flush;
                 tmp.push_back(out->outs[0]->value[i]);
             }
             else {
@@ -77,6 +91,7 @@ Simulator::generate_output(map<string, vector<bitvec>>& testcase) {
         }
         output_testcase[name] = out_val;
     }
+    // cout << "process done" << endl;
     // for (auto it = output_testcase.begin(); it != output_testcase.end(); it++) {
     //     cout << it->first << endl;
     //     for (int i = 0; i < it->second.size(); i++) {
@@ -86,6 +101,7 @@ Simulator::generate_output(map<string, vector<bitvec>>& testcase) {
     //         cout << endl;
     //     }
     // }
+    cout << "output generated" << endl;
     return;
 };
 
@@ -139,7 +155,9 @@ line = trim(line.substr(4));
         for (size_t i = 0; i < line.size(); i++) {
             if (line[i] == ',') {
                 const string name = trim(now);
-                wires[name] = new Based(name, NET);
+                if (wires.find(name) == wires.end()) {
+                    wires[name] = new Based(name, NET);
+                }
                 now = "";
                 continue;
             }
@@ -175,6 +193,7 @@ Simulator::print_val(string name, bitvec data) {
 
 void
 Simulator::generate_input(int num) {
+    cout << "generating inputs..." << endl;
     input_testcase.clear();
     srand(time(NULL));
     for (In* in: inputs) {
@@ -193,7 +212,7 @@ Simulator::generate_input(int num) {
         }
         input_testcase[in->name] = ins;
     }
-    cout << "input generated\n";
+    cout << "input generated" << endl;
 }
 
 void

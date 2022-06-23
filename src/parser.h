@@ -117,6 +117,7 @@ public:
         wires["1\'b1"] = new Based("1\'b1", NET);
         globalRef = 0;
         reducedNum = 0;
+        gate_cnt = 0;
     }
     ~Parser() {
         // remember to delete pointer
@@ -152,7 +153,7 @@ protected:
     size_t globalRef;
     string firstLine;
     size_t reducedNum;
-
+    size_t gate_cnt;
 };
 
 #endif  // __PARSER_H__

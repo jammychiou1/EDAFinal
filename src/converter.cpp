@@ -41,7 +41,7 @@ convert(string path, vector<map<vector<int>, __int128>> result, vector<pair<stri
                     coeff = -coeff;
                 }
                 if (coeff != 1) {
-                    line += to_string((int)term.second) + "*";
+                    line += to_string(coeff) + "*";
                 }
                 for (size_t j = 0; j < term.first.size(); j++) {
                     int num = term.first[j];

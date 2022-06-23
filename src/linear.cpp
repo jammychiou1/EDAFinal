@@ -336,7 +336,7 @@ pair<bool, map<termdec, i128>> solve_single(map<string, vector<u128>> inputs, ve
 
 pair<bool, vector<map<termdec, i128>>> solve(map<string, vector<bitvec>> inputs, map<string, vector<bitvec>> outputs) {
     if (inputs.size() > 6) {
-        cout << "here\n";
+        // cout << "here\n";
         return {false, vector<map<termdec, i128>>()};
     }
     for (auto &p : inputs) {
