@@ -5,18 +5,42 @@
 #include <bits/stdc++.h>
 #define METHOD_1 1
 #define METHOD_2 2
-#define CUR_METHOD 1
+#define CUR_METHOD 2
 int main(int argc, char **argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
+    if (argc != 5) {
+        cerr << "Usage: " << argv[0] << " -input <inputFile> -output <outputFile>" << endl;
+        return 0;
+    }
+    string arg1 = argv[1];
+    string arg2 = argv[2];
+    string arg3 = argv[3];
+    string arg4 = argv[4];
+    string input, output;
+    if (arg1 == "-input") {
+        if (arg3 != "-output") {
+            cerr << "Usage: " << argv[0] << "-input <inputFile> -output <outputFile>" << endl;
+            return 0;
+        }
+        input = arg2;
+        output = arg4;
+    }
+    else {
+        if (arg1 != "-output" || arg3 != "-input") {
+            cerr << "Usage: " << argv[0] << "-input <inputFile> -output <outputFile>" << endl;
+            return 0;
+        }
+        input = arg4;
+        output = arg2;
+    }
+
     if (CUR_METHOD == METHOD_2) {
     Parser parser;
-    if (argc < 2) 
-        parser.read("release/test01/top_primitive.v");
-    else
-        parser.read(argv[1]);
+    parser.read(input);
     parser.strash();
+    parser.write(output);
     /*
     vector<Out*> outputs = parser.getOut();
     for (int i = 0; i < outputs.size(); ++i) {
@@ -31,14 +55,15 @@ int main(int argc, char **argv) {
 
     else if (CUR_METHOD == METHOD_1) {
         Simulator simulator;
-        argc < 2 ? simulator.read("release/test01/top_primitive.v") : simulator.read(argv[1]);
+        //argc < 2 ? simulator.read("release/test01/top_primitive.v") : simulator.read(argv[1]);
+        simulator.read(input);
         simulator.generate_input();
         simulator.generate_output(simulator.input_testcase);
         cout << "start solving..." << endl;
         auto result = solve(simulator.input_testcase, simulator.output_testcase);
         result.first ? cout << "solved" << endl : cout << "can't solved" << endl;
-        string outPath = "out.v";
-        if (result.first) convert(outPath, result.second, simulator.input_info, simulator.output_info);
+        // string outPath = "out.v";
+        if (result.first) convert(output, result.second, simulator.input_info, simulator.output_info);
     }
 
     return 0;

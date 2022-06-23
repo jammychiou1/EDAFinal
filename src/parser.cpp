@@ -3,6 +3,7 @@
 void
 Parser::read(const string& path) {
     ifstream file(path.c_str());
+    inputPath = path;
     if (!file) {
         cerr << "Error opening file " << path << endl;
         return;
@@ -30,7 +31,6 @@ Parser::read(const string& path) {
             continue;
         }
         process_gate(line);
-        gate_cnt ++;
     }
 }
 
@@ -100,6 +100,7 @@ Parser::identify_gate(string &line) {
             return GateType(i);
         }
     }
+    // cerr << "Error line: " << line << endl;
     assert(false);
 }
 
@@ -134,6 +135,9 @@ Parser::process_input(string line) {
                 In* in = new In(name, width);
                 //inputs.push_back({width, trim(now)});
                 inputs.push_back(in);
+                for (int j = 0; j < width; j++) {
+                    
+                }
                 for (int j = 0; j < width; ++j) {
                     inputsMap[name + "[" + to_string(j) + "]"] = in->ins[j];
                     wires[name + "[" + to_string(j) + "]"] = in->ins[j];
@@ -355,6 +359,26 @@ Parser::strash_helper(Based* ptr) {
             // merge
             cout << "redundant: " << ptr->name << endl;
             reducedNum++;
+
+            Based* netPtr = ptr->fanouts[0];
+            Based* oldNetPtr = hash[make_pair(ptr->fanins, ptr->gateType)]->fanouts[0];
+            for (int i = 0; i < netPtr->fanouts.size(); ++i) {
+                Based* out = netPtr->fanouts[i];
+                auto it = find(out->fanins.begin(), out->fanins.end(), netPtr);
+                assert(it != out->fanins.end());
+                *it = oldNetPtr;
+                oldNetPtr->fanouts.push_back(out);
+            }
+            for (int i = 0; i < ptr->fanins.size(); ++i) {
+                Based* inPtr = ptr->fanins[i];
+                auto it = find(inPtr->fanouts.begin(), inPtr->fanouts.end(), ptr);
+                assert(it != inPtr->fanouts.end());
+                inPtr->fanouts.erase(it);
+            }
+            garbageGates.push_back(ptr);
+            replaceWires.push_back(make_pair(netPtr, oldNetPtr));
+
+            /*
             Based* oldPtr = hash[make_pair(ptr->fanins, ptr->gateType)];
             for (size_t i = 0; i < ptr->fanouts.size(); ++i) {
                 oldPtr->addFanout(ptr->fanouts[i]);
@@ -372,6 +396,7 @@ Parser::strash_helper(Based* ptr) {
                 assert(it != inPtr->fanouts.end());
                 inPtr->fanouts.erase(it);
             }
+            */
         }
         
     }
@@ -387,3 +412,124 @@ Parser::hashKey(vector<Based*> v, int type) const {
     return ret + type;
 }
 */
+
+void
+Parser::write(const string& path) {
+    ifstream in(inputPath.c_str());
+    ofstream ofs(path.c_str());
+    assert(ofs);
+    string line;
+    while (getline(in, line, ';')) {
+        string parsedLine = Parser::trim(line);
+        if (parsedLine.substr(0, 6) == "module") {
+            ofs << line << ";" << endl;
+            continue;
+        }
+        if (parsedLine.substr(0, 9) == "endmodule") {
+            ofs << line;
+            continue;
+        }
+        if (parsedLine.substr(0, 5) == "input") {
+            ofs << line << ";" << endl;
+            continue;
+        }
+        if (parsedLine.substr(0, 6) == "output") {
+            ofs << line << ";" << endl;
+            continue;
+        }
+        if (parsedLine.substr(0, 4) == "wire") {
+            ofs << "  " << writeWire(line) << ";" << endl;
+            continue;
+        }
+        string s = writeGate(line);
+        if (s != "")
+            ofs << "  " << s << ";" << endl;
+    }
+}
+
+
+string
+Parser::writeWire(string line) {
+    line = trim(line);
+    string parsedLine = trim(line.substr(4));
+    pair<int, string> result = process_word_desc(parsedLine);
+    parsedLine = result.second;
+    int width = result.first;
+
+    parsedLine.push_back(',');
+    string now;
+    if (width != -1) {
+        return line;
+    }
+    string ret = "wire ";
+    for (int i = 0; i < parsedLine.size(); i++) {
+        if (parsedLine[i] == ',') {
+            // wires[trim(now)].input = nullptr;
+            const string name = trim(now);
+            bool replaced = false;
+            for (int i = 0; i < replaceWires.size(); ++i) {
+                if (replaceWires[i].first->name == name) {
+                    ret += replaceWires[i].second->name;
+                    replaced = true;
+                    break;
+                }
+            }
+            if (!replaced)
+                ret += name;
+            ret += ", ";
+            now = "";
+            continue;
+        }
+        now.push_back(parsedLine[i]);
+    }
+    ret.pop_back(); // remove last ' '
+    ret.pop_back(); // remove last ','
+    return ret;
+}
+
+string
+Parser::writeGate(string line) {
+    line = trim(line);
+    GateType gateType = identify_gate(line);
+    size_t para = line.find("(");
+    assert(para != string::npos);
+    string name = line.substr(0, para);
+    name = Parser::trim(name);
+    
+    for (int i = 0; i < garbageGates.size(); ++i) {
+        if (garbageGates[i]->name == name)
+            return "";
+    }
+    
+    line = line.substr(para);
+    assert(line[0] == '(');
+    assert(line[line.size() - 1] == ')');
+    line = line.substr(1, line.size() - 2) + ",";
+    string now = "";
+    vector<string> types = {"and", "or", "nand", "nor", "not", "buf", "xor", "xnor"}; 
+    string ret = types[gateType] + " " + name + "(";
+    for (size_t i = 0; i < line.size(); i++) {
+        if (line[i] == ',') {
+            now = trim(now);
+            bool replaced = false;
+            for (int i = 0; i < replaceWires.size(); ++i) {
+                if (replaceWires[i].first->name == now) {
+                    ret += replaceWires[i].second->name;
+                    replaced = true;
+                    break;
+                }
+            }
+            if (!replaced)
+                ret += now;
+            ret += " ,";
+            now = "";
+            continue;
+        }
+        now.push_back(line[i]);
+    }
+    ret.pop_back(); // remove last ','
+    ret.pop_back(); // remove last ' '
+    ret += ")";
+    return ret;
+}
+

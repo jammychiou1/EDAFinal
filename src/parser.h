@@ -117,17 +117,18 @@ public:
         wires["1\'b1"] = new Based("1\'b1", NET);
         globalRef = 0;
         reducedNum = 0;
-        gate_cnt = 0;
     }
     ~Parser() {
         // remember to delete pointer
     }
-    virtual void read(const string&);
+    void read(const string&);
     vector<In*> getIns() const { return inputs; }
     vector<Out*> getOuts() const { return outputs; }
     void dfsFanin(Based* ptr = nullptr) const;
 
     void strash();
+
+    void write(const string& path);
 
 protected:
     vector<In*> inputs;
@@ -148,12 +149,21 @@ protected:
     static pair<int, string> process_word_desc(string line);
     static GateType identify_gate(string &line);
 
+    
+    
+
     map<pair<vector<Based*>, int>, Based*> hash;
     void strash_helper(Based* ptr);
     size_t globalRef;
     string firstLine;
     size_t reducedNum;
-    size_t gate_cnt;
+
+private:
+    string inputPath;
+    string writeWire(string line);
+    string writeGate(string line);
+    vector<Based*> garbageGates;
+    vector<pair<Based*, Based*>> replaceWires;
 };
 
 #endif  // __PARSER_H__
