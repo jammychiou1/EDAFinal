@@ -9,7 +9,10 @@ using namespace std;
 class Simulator: public Parser {
 
 public:
-    Simulator() {};
+    Simulator() {
+        wires["1\'b0"] = new Based("1\'b0", NET);
+        wires["1\'b1"] = new Based("1\'b1", NET);
+    };
     ~Simulator() {};
     
     void generate_output(map<string, vector<bitvec>>&);

@@ -10,7 +10,6 @@ Parser::read(const string& path) {
     string line;
     while (getline(file, line, ';')) {
         line = Parser::trim(line);
-        //cout << '<' << line << '>' << '\n';
         if (line.substr(0, 6) == "module") {
             firstLine = line;
             continue;
@@ -134,15 +133,12 @@ Parser::process_input(string line) {
                 In* in = new In(name, width);
                 //inputs.push_back({width, trim(now)});
                 inputs.push_back(in);
-                // cout << "input: " << name << " addr: " << in << "\n";
                 for (int j = 0; j < width; j++) {
                     
                 }
                 for (int j = 0; j < width; ++j) {
                     inputsMap[name + "[" + to_string(j) + "]"] = in->ins[j];
                     wires[name + "[" + to_string(j) + "]"] = in->ins[j];
-                    // cout << "name: " << name + "[" + to_string(j) + "]" << endl;
-                    // cout << "address: " << in->ins[j] << endl;
                 }
                 now = "";
                 continue;
@@ -242,8 +238,6 @@ Parser::process_wire(string line) {
                     //wires[now + "[" + to_string(j) + "]"].input = nullptr;
                     const string name = now + "[" + to_string(j) + "]";
                     wires[name] = new Based(name, NET);
-                    //wires[name]->addFanin(nullptr);
-                    //cout << "find name: " << name << endl;
                     auto it = outputsMap.find(name);
                     if (it != outputsMap.end()) {
                         //cout << "found in outputs" << endl;
@@ -283,16 +277,13 @@ Parser::process_gate(string line) {
     size_t para = line.find("(");
     assert(para != string::npos);
     string name = line.substr(0, para);
-    //cerr << name << '\n';
     name = Parser::trim(name);
     line = line.substr(para);
     assert(line[0] == '(');
     assert(line[line.size() - 1] == ')');
     line = line.substr(1, line.size() - 2) + ",";
-    //cerr << line << '\n';
     string now;
     bool is_output = true;
-    //Gate *gate = new Gate();
     Based* gate = new Based(name, GATE);
     gate->gateType = gateType;
     for (size_t i = 0; i < line.size(); i++) {
@@ -300,26 +291,14 @@ Parser::process_gate(string line) {
             now = trim(now);
             assert(wires[now] != nullptr);
             assert(wires.find(now) != wires.end());
-            // cout << "gate: " << gate->name << ", wire: " << wires[now]->name << endl;
-            // cout << "now: " << now << endl;
             if (is_output) {
                 is_output = false;
-                // wires[now]->fanins.push_back(gate);
-                // gate->fanouts.push_back(wires[now]);
-                // cout << "before: " << wires[now] << endl;
                 wires[now]->addFanin(gate);
                 gate->addFanout(wires[now]);
-                // cout << "after: " << wires[now] << endl;
-                //cout << "add fanin: " << wires[now]->getName() << " " << name << endl;
             }
             else {
-                // wires[now]->fanouts.push_back(gate);
-                // gate->fanins.push_back(wires[now]);
-                // cout << "before: " << wires[now] << endl;
                 wires[now]->addFanout(gate);
                 gate->addFanin(wires[now]);
-                // cout << "after: " << wires[now] << endl;
-                //cout << "add fanout: " << wires[now]->getName() << " " << name << endl;
             }
             now = "";
             continue;
