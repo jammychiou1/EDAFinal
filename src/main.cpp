@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "simulator.h"
 #include "linear.h"
+#include "converter.h"
 #include <bits/stdc++.h>
 #define METHOD_1 1
 #define METHOD_2 2
@@ -35,33 +36,9 @@ int main(int argc, char **argv) {
         simulator.generate_output(simulator.input_testcase);
         auto result = solve(simulator.input_testcase, simulator.output_testcase);
         cout << result.first << endl;
-        for (auto mp : result.second) {
-            for (auto term : mp) {
-                print_termdec(term.first);
-                cout << (int) term.second << '\n';
-            }
-            cout << '\n';
-            // for (int i = 0; i < 5; i++) {
-            //     cout << i << endl;
-            //     for (auto it = simulator.input_testcase.begin(); it != simulator.input_testcase.end(); it++) {
-            //         cout << it->first << endl;
-            //         for (int k = 0; k < it->second[0].size(); k++) 
-            //             cout << it->second[i][k];
-            //         cout << endl;
-            //     }
-            //     for (auto it = simulator.output_testcase.begin(); it != simulator.output_testcase.end(); it++) {
-            //         cout << it->first << endl;
-            //         for (int k = 0; k < it->second[0].size(); k++) 
-            //             cout << it->second[i][k];
-            //         cout << endl;
-            //     }
-            //     cout << endl;
-            // }
-        }
+        string outPath = "out.v";
+        if (result.first) convert(outPath, result.second, simulator.input_info, simulator.output_info);
     }
-    
-    
-
 
     return 0;
 }

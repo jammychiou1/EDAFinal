@@ -121,7 +121,7 @@ public:
     ~Parser() {
         // remember to delete pointer
     }
-    void read(const string&);
+    virtual void read(const string&);
     vector<In*> getIns() const { return inputs; }
     vector<Out*> getOuts() const { return outputs; }
     void dfsFanin(Based* ptr = nullptr) const;
@@ -146,9 +146,6 @@ protected:
     static string trim(const string&);
     static pair<int, string> process_word_desc(string line);
     static GateType identify_gate(string &line);
-
-    
-    
 
     map<pair<vector<Based*>, int>, Based*> hash;
     void strash_helper(Based* ptr);

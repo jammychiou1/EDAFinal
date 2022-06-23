@@ -195,3 +195,16 @@ Simulator::generate_input(int num) {
     }
     cout << "input generated\n";
 }
+
+void
+Simulator::read(const string& path) {
+    Parser::read(path);
+    input_info.clear();
+    output_info.clear();
+    for (auto &in: inputs) {
+        input_info.push_back(make_pair(in->name, in->width));
+    }
+    for (auto &out: outputs) {
+        output_info.push_back(make_pair(out->name, out->width));
+    }
+}

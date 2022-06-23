@@ -2,8 +2,8 @@
 CC := g++
 CCFLAGS := -Wall -std=gnu++17 -ggdb #-O2
 
-main: main.o parser.o simulator.o linear.o
-	$(CC) -o $@ $(CCFLAGS) main.o parser.o simulator.o linear.o
+main: main.o parser.o simulator.o linear.o converter.o
+	$(CC) -o $@ $(CCFLAGS) main.o parser.o simulator.o linear.o converter.o
 
 main.o: main.cpp parser.h
 	$(CC) -c $(CCFLAGS) main.cpp
@@ -22,6 +22,9 @@ linear_test.o: linear_test.cpp linear.h
 
 linear.o: linear.cpp linear.h
 	$(CC) -c $(CCFLAGS) linear.cpp
+
+converter.o: converter.cpp converter.h
+	$(CC) -c $(CCFLAGS) converter.cpp
 
 clean:
 	rm -f *.o
