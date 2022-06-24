@@ -66,10 +66,9 @@ int main(int argc, char **argv) {
         simulator.generate_input(possibly_control.first, testVal);
         simulator.generate_output(simulator.input_testcase);
         auto conditional_result = solve(simulator.input_testcase, simulator.output_testcase);
-        if (conditional_result.first) {
-            int sz = possibly_control.second == -1 ? 0 : (int) pow(2, possibly_control.second);
+        if (conditional_result.first && possibly_control.second <= 10) {
+            int sz = (possibly_control.second == -1) ? 2 : (int) pow(2, possibly_control.second);
             for (int i = 0; i < sz; i++) {
-                // cout << i << endl;
                 simulator.generate_input(possibly_control.first, i);
                 simulator.generate_output(simulator.input_testcase);
                 auto sep_result = solve(simulator.input_testcase, simulator.output_testcase);
