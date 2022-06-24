@@ -381,7 +381,13 @@ pair<bool, vector<map<termdec, i128>>> solve(map<string, vector<bitvec>> inputs,
             continue;
         }
 
-        res = solve_single(inputs_u128, output_u128, width, 2, 3);
+        res = solve_single(inputs_u128, output_u128, width, 2, 5);
+        if (res.first) {
+            ans.push_back(res.second);
+            continue;
+        }
+
+        res = solve_single(inputs_u128, output_u128, width, 3, 5);
         if (res.first) {
             ans.push_back(res.second);
             continue;
