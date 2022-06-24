@@ -84,22 +84,32 @@ bool improve_pivot(Mat& A, Mat& L_or_R, int i, bool transpose) {
     bool flag = true;
     for (int i2 = i + 1; i2 < A.get_h_or_w(transpose); i2++) {
         //cout << "i2 is now " << i2 << '\n';
-        while (A.at(i2, i, transpose) != 0) {
+        if (A.at(i2, i, transpose) != 0) {
             flag = false;
-            //cout << "i, i and i2, i " << u128_to_string(A.at(i, i, transpose)) << ' ' << u128_to_string(A.at(i2, i, transpose)) << '\n';
-            i128 c = A.at(i, i, transpose) / A.at(i2, i, transpose);
-            //cout << "c " << u128_to_string(c) << '\n';
-            //cout << "-c " << u128_to_string((-c) & A.mask) << '\n';
-            //cout << "A\n";
-            //A.print();
-            //char d;
-            //cin >> d;
-            A.add_row_or_col_i_to_j(i2, i, ((~c) + 1) & A.mask, transpose);
-            A.swap_row_or_col(i2, i, transpose);
-            L_or_R.add_row_or_col_i_to_j(i2, i, ((~c) + 1) & A.mask, transpose);
-            L_or_R.swap_row_or_col(i2, i, transpose);
+            while (A.at(i, i, transpose) != 0) {
+                //cout << "i, i and i2, i " << u128_to_string(A.at(i, i, transpose)) << ' ' << u128_to_string(A.at(i2, i, transpose)) << '\n';
+                i128 c = A.at(i2, i, transpose) / A.at(i, i, transpose);
+                //cout << "c " << u128_to_string(c) << '\n';
+                //cout << "-c " << u128_to_string((-c) & A.mask) << '\n';
+                //cout << "A\n";
+                //A.print();
+                //cout << endl;
+                //char d;
+                //cin >> d;
+                A.add_row_or_col_i_to_j(i, i2, ((~c) + 1) & A.mask, transpose);
+                A.swap_row_or_col(i, i2, transpose);
+                L_or_R.add_row_or_col_i_to_j(i, i2, ((~c) + 1) & A.mask, transpose);
+                L_or_R.swap_row_or_col(i, i2, transpose);
+            }
+            A.swap_row_or_col(i, i2, transpose);
+            L_or_R.swap_row_or_col(i, i2, transpose);
         }
         //cout << (unsigned long long) A.at(i, i, transpose) << ' ' << (unsigned long long) A.at(i2, i, transpose) << '\n';
+        //cout << "A\n";
+        //A.print();
+        //cout << endl;
+        //char d;
+        //cin >> d;
     }
     return flag;
 }
