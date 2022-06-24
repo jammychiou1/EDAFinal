@@ -1,0 +1,20 @@
+module top(in1, in2, in3, out1, out4, out2, out3, out5, out6);
+  input [30:0] in1;
+  input [31:0] in2;
+  input [31:0] in3;
+  output [32:0] out1;
+  output [32:0] out4;
+  output out2;
+  output out3;
+  output out5;
+  output out6;
+  wire [30:0] in1;
+  wire [31:0] in2;
+  wire [31:0] in3;
+  wire [32:0] out1;
+  wire [32:0] out4;
+  wire out2;
+  wire out3;
+  wire out5;
+  wire out6;
+endmodule

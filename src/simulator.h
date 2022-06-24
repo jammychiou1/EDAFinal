@@ -16,12 +16,14 @@ public:
     ~Simulator() {};
     
     void generate_output(map<string, vector<bitvec>>&);
-    void generate_input(int num=1000);
+    void generate_input(string fixed="", int val=-1, int num=1000);
     void read(const string&);
+    pair<string, int> find_smallest_input();
     vector<pair<string, int>> input_info;
     vector<pair<string, int>> output_info;
     map<string, vector<bitvec>> input_testcase;
     map<string, vector<bitvec>> output_testcase;
+    
 private:
     bitvec calculate(GateType gateType, bitvec v1, bitvec v2={});
     void process_wire(string line);

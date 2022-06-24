@@ -1,8 +1,8 @@
 #include "simulator.h"
-
+#define DEBUG_MSG false
 void
 Simulator::generate_output(map<string, vector<bitvec>>& testcase) {
-    cout << "start generate output..." << endl;
+    if(DEBUG_MSG) cout << "start generate output..." << endl;
     // cout << "gate count: " << gate_cnt << endl;
     output_testcase.clear();
     int testcase_size = (int)testcase.begin()->second.size();
@@ -101,7 +101,7 @@ Simulator::generate_output(map<string, vector<bitvec>>& testcase) {
     //         cout << endl;
     //     }
     // }
-    cout << "output generated" << endl;
+    if(DEBUG_MSG) cout << "output generated" << endl;
     return;
 };
 
@@ -192,27 +192,44 @@ Simulator::print_val(string name, bitvec data) {
 }
 
 void
-Simulator::generate_input(int num) {
-    cout << "generating inputs..." << endl;
+Simulator::generate_input(string fixed, int val, int num) {
+    if(DEBUG_MSG) cout << "start generating inputs..." << endl;
     input_testcase.clear();
     srand(time(NULL));
+    
     for (In* in: inputs) {
         vector<bitvec> ins;
         for (int i = 0; i < num; i++) {
             bitvec tmp;
             if (in->width == -1) {
-                tmp.push_back(rand() % 2);
-            }
-            else {
-                for (int j = 0; j < in->width; j++) {
+                if (in->name == fixed) {
+                    tmp.push_back((bool)val);
+                }
+                else {
                     tmp.push_back(rand() % 2);
                 }
+            }
+            else {
+                if (in->name == fixed) {
+                    int tmp_val = val;
+                    for (int j = 0; j < in->width; j++) {
+                        tmp.push_back((bool)(tmp_val % 2));
+                        tmp_val = tmp_val >> 1;
+                    }
+                    reverse(tmp.begin(), tmp.end());
+                }
+                else {
+                    for (int j = 0; j < in->width; j++) {
+                        tmp.push_back(rand() % 2);
+                    }
+                }
+                
             }
             ins.push_back(tmp);
         }
         input_testcase[in->name] = ins;
     }
-    cout << "input generated" << endl;
+    if(DEBUG_MSG) cout << "inputs generated" << endl;
 }
 
 void
@@ -226,4 +243,17 @@ Simulator::read(const string& path) {
     for (auto &out: outputs) {
         output_info.push_back(make_pair(out->name, out->width));
     }
+}
+
+pair<string, int>
+Simulator::find_smallest_input() {
+    int minWidth = INT_MAX;
+    string minInput = "";
+    for (const auto& in: inputs) {
+        if (in->width < minWidth) {
+            minWidth = in->width;
+            minInput = in->name;
+        }
+    }
+    return make_pair(minInput, minWidth);
 }
