@@ -1,7 +1,6 @@
 *.o
 .DS_Store
 *.out
-*.v
 ./src/*.v
 ./src/*.o
 ./src/main
