@@ -5,7 +5,15 @@
 #include <bits/stdc++.h>
 #define METHOD_1 1
 #define METHOD_2 2
-#define CUR_METHOD 2
+#define CUR_METHOD 1
+
+void StructurallyEquivalentReduction(const string& input, const string& output) {
+    Parser parser;
+    parser.read(input);
+    parser.strash();
+    parser.write(output);
+}
+
 int main(int argc, char **argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
@@ -36,21 +44,38 @@ int main(int argc, char **argv) {
         output = arg2;
     }
 
-    if (CUR_METHOD == METHOD_2) {
-    Parser parser;
-    parser.read(input);
-    parser.strash();
-    parser.write(output);
-    /*
-    vector<Out*> outputs = parser.getOut();
-    for (int i = 0; i < outputs.size(); ++i) {
-        for (int j = 0; j < outputs[i]->outs.size(); ++j) {
-            //cout << "name: " << outputs[i]->outs[j]->getName() << endl;
-            parser.dfsFanin(outputs[i]->outs[j]);
-        }
-        cout << endl;
+    Simulator simulator;
+    simulator.read(input);
+    simulator.generate_input();
+    simulator.generate_output(simulator.input_testcase);
+    cout << "start solving..." << endl;
+    auto result = solve(simulator.input_testcase, simulator.output_testcase);
+    result.first ? cout << "solved" << endl : cout << "can't solved" << endl;
+    if (result.first) {
+        convert(output, result.second, simulator.input_info, simulator.output_info);  
+        cout << "solved by Polynomial Coefficient Recovering" << endl;
     }
-    */
+    else {
+        StructurallyEquivalentReduction(input, output);
+        cout << "solved by Structurally Equivalent Reduction" << endl;
+    }
+
+    /*
+    if (CUR_METHOD == METHOD_2) {
+        Parser parser;
+        parser.read(input);
+        parser.strash();
+        parser.write(output);
+    
+    // vector<Out*> outputs = parser.getOut();
+    // for (int i = 0; i < outputs.size(); ++i) {
+    //     for (int j = 0; j < outputs[i]->outs.size(); ++j) {
+    //         //cout << "name: " << outputs[i]->outs[j]->getName() << endl;
+    //         parser.dfsFanin(outputs[i]->outs[j]);
+    //     }
+    //     cout << endl;
+    // }
+    
     }
 
     else if (CUR_METHOD == METHOD_1) {
@@ -65,6 +90,6 @@ int main(int argc, char **argv) {
         // string outPath = "out.v";
         if (result.first) convert(output, result.second, simulator.input_info, simulator.output_info);
     }
-
+    */
     return 0;
 }
