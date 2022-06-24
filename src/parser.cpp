@@ -249,10 +249,10 @@ Parser::process_wire(string line) {
                     it = inputsMap.find(name);
                     if (it != inputsMap.end()) {
                         //cout << "found in inputs" << endl;
-                        cout << "before: " << wires[name] << endl;
+                        //cout << "before: " << wires[name] << endl;
                         it->second->addFanout(wires[name]);
                         wires[name]->addFanin(it->second);
-                        cout << "after: " << wires[name] << endl;
+                        //cout << "after: " << wires[name] << endl;
                     }
                 }
                 now = "";
@@ -343,7 +343,7 @@ Parser::strash() {
     for (auto it = inputsMap.begin(); it != inputsMap.end(); ++it) {
         strash_helper(it->second);
     }
-    cout << "Total reduce " << reducedNum << " equivalent gate" << endl;
+    //cout << "Total reduce " << reducedNum << " equivalent gate" << endl;
 }
 
 void
@@ -357,7 +357,7 @@ Parser::strash_helper(Based* ptr) {
         }
         if (hash[make_pair(ptr->fanins, ptr->gateType)] != ptr) {
             // merge
-            cout << "redundant: " << ptr->name << endl;
+            //cout << "redundant: " << ptr->name << endl;
             reducedNum++;
 
             Based* netPtr = ptr->fanouts[0];
