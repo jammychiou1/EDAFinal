@@ -30,7 +30,7 @@ int main() {
     //mat B{{4, 2}, {0, 4}, {1, 1}};
     //vec b{10, 12, 10};
     //solve_mod_pow_2(B, b, 4);
-    
+
     map<string, vector<vector<bool>>> inputs;
     map<string, vector<vector<bool>>> outputs;
     for (int i = 0; i < 1000; i++) {

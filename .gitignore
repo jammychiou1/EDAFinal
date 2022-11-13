@@ -1,7 +1,8 @@
-*.o
-.DS_Store
-*.out
-*.v
-./src/*.v
-./src/*.o
-./src/main
+compile_commands.json
+
+.cache/
+
+.DS_Store/
+
+build/
+circuits/

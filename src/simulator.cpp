@@ -196,7 +196,7 @@ Simulator::generate_input(string fixed, int val, int num) {
     if(DEBUG_MSG) cout << "start generating inputs..." << endl;
     input_testcase.clear();
     srand(time(NULL));
-    
+
     for (In* in: inputs) {
         vector<bitvec> ins;
         for (int i = 0; i < num; i++) {
@@ -223,7 +223,7 @@ Simulator::generate_input(string fixed, int val, int num) {
                         tmp.push_back(rand() % 2);
                     }
                 }
-                
+
             }
             ins.push_back(tmp);
         }
