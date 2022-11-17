@@ -1,58 +1,81 @@
 #include <bits/stdc++.h>
-#include "linear.h"
+#include <flint/fmpz_matxx.h>
+#include <flint/fmpzxx.h>
+#include "solver.h"
 using namespace std;
-typedef unsigned __int128 u128;
-typedef vector<u128> vec;
-typedef vector<vec> mat;
 
-vector<bool> from_int(int a, int width) {
-    vector<bool> ans(width);
-    for (int i = 0; i < width; i++) {
-        if (a & (1ll << i)) {
-            ans[width - 1 - i] = true;
-        }
-    }
-    return ans;
-}
+typedef flint::fmpzxx BigInt;
+typedef flint::fmpz_matxx Mat;
 
 int main() {
-    //Mat A(15);
-    //A.data = mat{{4, 2}, {0, 4}, {1, 1}};
-    //auto [D, L, R] = smith_form(A);
-    //D.print();
-    //L.print();
-    //R.print();
-    //(L * A * R).print();
+  int n = 15;
+  Mat A(n, 3), y(n, 1);
+  int M = 16;
+  int mask = M - 1;
+  for (int i = 0; i < n; i++) {
+    int a = rand() % M;
+    int b = rand() % M;
+    int c = rand() % M;
+    int o1 = (2 * a + 4 * b + mask * c) & mask;
+    A.at(i, 0) = a;
+    A.at(i, 1) = b;
+    A.at(i, 2) = c;
+    y.at(i, 0) = o1;
+  }
 
-    //int test = inv(3, 16);
-    //cout << test << '\n';
+  A.print_pretty();
+  cout << '\n';
+  y.print_pretty();
+  cout << '\n';
+  cout << '\n';
 
-    //mat B{{4, 2}, {0, 4}, {1, 1}};
-    //vec b{10, 12, 10};
-    //solve_mod_pow_2(B, b, 4);
+  optional<Mat> s = special_solution(A, y, BigInt(mask));
+  s->print_pretty();
 
-    map<string, vector<vector<bool>>> inputs;
-    map<string, vector<vector<bool>>> outputs;
-    for (int i = 0; i < 1000; i++) {
-        u128 a = rand() % 16;
-        u128 b = rand() % 16;
-        u128 c = rand() % 16;
-        u128 mask = 1023;
-        inputs["in1"].push_back(from_int(a, 4));
-        inputs["in2"].push_back(from_int(b, 4));
-        inputs["in3"].push_back(from_int(c, 4));
-        //inputs["in4"].push_back(from_int(rand(), 4));
-        //inputs["in5"].push_back(from_int(rand(), 4));
-        //inputs["in6"].push_back(from_int(rand(), 4));
-        outputs["out1"].push_back(from_int((100 + 200 * a * b - 3 * b * c) & mask, 10));
-        outputs["out2"].push_back(from_int((a * a + b * b) & mask, 10));
-    }
-    auto result = solve(inputs, outputs);
-    cout << result.first << '\n';
-    for (auto mp : result.second) {
-        for (auto term : mp) {
-            print_termdec(term.first);
-            cout << (int) term.second << '\n';
-        }
-    }
+  // L A R = D
+  // auto [D, L, R] = smith_normal_form(A, BigInt(mask));
+
+  // D.print_pretty();
+  // cout << '\n';
+  // L.print_pretty();
+  // cout << '\n';
+  // R.print_pretty();
+  // cout << '\n';
+
+
+  // L A R = D
+  // A x = b
+  // L A x = L b
+  // D RR x = L A R RR x = L b
+
+  // Mat test(L * A * R);
+  // for (int i = 0; i < test.rows(); i++) {
+  //   for (int j = 0; j < test.cols(); j++) {
+  //     test.at(i, j) = BigInt(test.at(i, j) & BigInt(mask));
+  //     BigInt(test.at(i, j) & BigInt(mask)).print();
+  //   }
+  // }
+
+  // test.print_pretty();
+  // cout << '\n';
+
+  // A.set_rref_mod(BigInt(M));
+  // A.print_pretty();
+  // cout << '\n';
+
+  // Mat C(n, 3 + n);
+  // for (int i = 0; i < n; i++) {
+  //   for (int j = 0; j < 3; j++) {
+  //     C.at(i, j) = A.at(i, j);
+  //   }
+  //   C.at(i, 3 + i) = M;
+  // }
+  // C.print_pretty();
+  // cout << '\n';
+  // Mat D(n, 3 + n);
+  // int m;
+  // flint::ltupleref(m, D);
+  // auto res = flint::nullspace(C);
+  // res.get<1>().print_pretty();
+  // cout << '\n';
 }

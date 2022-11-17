@@ -1,3 +1,6 @@
+#ifndef LINEAR_H
+#define LINEAR_H
+
 #include <utility>
 #include <vector>
 #include <map>
@@ -53,7 +56,7 @@ struct Mat {
         }
 
         Mat operator*(const Mat& A);
-        
+
         Mat(int n, unsigned __int128 mask);
         Mat(std::pair<int, int> shape, unsigned __int128 mask);
         Mat(std::vector<unsigned __int128>, unsigned __int128 mask);
@@ -91,16 +94,18 @@ void print_termdec(termdec term);
 // return (success, solution)
 // solution: [
 //     {
-//         (0, 0): 0, 
+//         (0, 0): 0,
 //         (0, 1): 1,
 //         (1, 0): 1,
 //         (1, 1): 0
 //     }, // for out1
 //     {
-//         (0, 0): 0, 
+//         (0, 0): 0,
 //         (0, 1): 0,
 //         (1, 0): 0,
 //         (1, 1): 1
 //     }, // for out2
 // ]
 std::pair<bool, std::vector<std::map<std::vector<int>, __int128>>> solve(std::map<std::string, std::vector<std::vector<bool>>> inputs, std::map<std::string, std::vector<std::vector<bool>>> outputs);
+
+#endif
