@@ -295,52 +295,6 @@ pair<bool, map<termdec, i128>> solve_single(map<string, vector<u128>> inputs, ve
     mat AA;
 
     return {false, map<termdec, i128>()};
-
-    // vector<termdec> terms;
-    // termdec tmp;
-    // n_m_simple_terms_rec(n, m, inputs.size(), terms, tmp);
-
-    // //cout << "generated terms\n";
-    // //for (int i = 0; i < terms.size(); i++) {
-    // //    print_termdec(terms[i]);
-    // //}
-
-    // for (int i = 0; i < count; i++) {
-    //     vector<u128> input_sample;
-    //     for (auto p : inputs) {
-    //         input_sample.push_back(p.second[i]);
-    //     }
-
-    //     vector<u128> row = gen_row(input_sample, terms, mask);
-    //     AA.push_back(row);
-    //     //cout << "input sample:\n";
-    //     //for (u128 a : input_sample) {
-    //     //    cout << u128_to_string(a) << ' ';
-    //     //}
-    //     //cout << '\n';
-    //     //cout << "row:\n";
-    //     //for (u128 a : row) {
-    //     //    cout << u128_to_string(a) << ' ';
-    //     //}
-    //     //cout << '\n';
-    //     //cout << "output " << u128_to_string(output[i]) << '\n';
-    // }
-    // auto [success, x] = solve_mod_pow_2(AA, output, mod);
-    // if (!success) {
-    //     return {false, map<termdec, i128>()};
-    // }
-    // map<termdec, i128> result;
-    // for (int i = 0; i < x.size(); i++) {
-    //     if (x[i] > mod / 2) {
-    //         result[terms[i]] = -(mod - x[i]);
-    //     }
-    //     else {
-    //         result[terms[i]] = x[i];
-    //     }
-    //     //print_termdec(terms[i]);
-    //     //cout << "x " << u128_to_string(x[i]) << ' ' << (long long) x[i] << '\n';
-    // }
-    // return {true, result};
 }
 
 pair<bool, vector<map<termdec, i128>>> solve(map<string, vector<bitvec>> inputs, map<string, vector<bitvec>> outputs) {
