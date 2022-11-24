@@ -8,6 +8,8 @@ typedef flint::fmpzxx BigInt;
 typedef flint::fmpz_matxx Mat;
 typedef flint::frandxx RandState;
 
+optional<Mat> short_solution(Mat A, Mat b, BigInt mask);
+
 int main() {
 
   RandState state;
@@ -20,7 +22,10 @@ int main() {
     BigInt a = BigInt::randm(state, M);
     BigInt b = BigInt::randm(state, M);
     BigInt c = BigInt::randm(state, M);
-    BigInt o1 = BigInt((2 * a + 4 * b + (M - 1) * c + 3 * a * b + a * a * (M - 4) + 9 * (b * c) + (M - 5) * a * a * c + (M - 3) * (BigInt(1) << c.to<ulong>())) & mask);
+    BigInt o1 = BigInt((2 * a + 4 * b + (M - 1) * c + 3 * a * b +
+                        a * a * (M - 4) + 9 * (b * c) + (M - 5) * a * a * c +
+                        (M - 3) * (BigInt(1) << c.to<ulong>())) &
+                       mask);
     A.at(i, 0) = 1;
     A.at(i, 1) = a;
     A.at(i, 2) = b;

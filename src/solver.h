@@ -1,5 +1,5 @@
-#ifndef SOLVER_H
-#define SOLVER_H
+#ifndef __SOLVER_H__
+#define __SOLVER_H__
 
 #include <functional>
 #include <map>
@@ -12,9 +12,6 @@
 
 typedef flint::fmpzxx BigInt;
 typedef std::vector<int> TermDesc;
-
-std::optional<flint::fmpz_matxx>
-short_solution(flint::fmpz_matxx A, flint::fmpz_matxx b, BigInt mask);
 
 class Solver {
 private:
@@ -54,4 +51,4 @@ public:
   void solve();
 };
 
-#endif
+#endif // __SOLVER_H__
