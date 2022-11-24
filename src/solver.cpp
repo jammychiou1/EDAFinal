@@ -499,10 +499,10 @@ void Solver::solve_output(std::string name) {
 
   vector<TermDesc> terms = n_m_simple_terms(3, 3, m_input_size());
 
-  for (TermDesc term : terms) {
-    cout << m_print_term(term) << '\n';
-  }
-  cout << '\n';
+  // for (TermDesc term : terms) {
+  //   cout << m_print_term(term) << '\n';
+  // }
+  // cout << '\n';
 
   int cols = terms.size();
   int rows = m_samples.size();
