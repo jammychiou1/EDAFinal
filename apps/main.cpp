@@ -100,27 +100,5 @@ int main(int argc, char **argv) {
     cout << "solved by Structurally Equivalent Reduction" << endl;
   }
 
-  /*
-  if (CUR_METHOD == METHOD_2) {
-      Parser parser;
-      parser.read(input);
-      parser.strash();
-      parser.write(output);
-
-  // vector<Out*> outputs = parser.getOut();
-  // for (int i = 0; i < outputs.size(); ++i) {
-  //     for (int j = 0; j < outputs[i]->outs.size(); ++j) {
-  //         //cout << "name: " << outputs[i]->outs[j]->getName() << endl;
-  //         parser.dfsFanin(outputs[i]->outs[j]);
-  //     }
-  //     cout << endl;
-  // }
-
-  }
-
-  else if (CUR_METHOD == METHOD_1) {
-
-  }
-  */
   return 0;
 }
