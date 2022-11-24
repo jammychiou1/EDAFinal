@@ -219,19 +219,19 @@ Mat closest_vector_embedded(Mat L, Mat y, BigInt mask) {
   A.at(d, d) = weight_y;
 
   lll_reduce(L);
-  L.print_pretty();
-  cout << " is reduced L\n";
+  // L.print_pretty();
+  // cout << " is reduced L\n";
 
   for (int t = 0; t < rounds; t++) {
-    cout << "----------" << t << "----------\n";
+    // cout << "----------" << t << "----------\n";
 
-    A.print_pretty();
-    cout << " is A\n";
+    // A.print_pretty();
+    // cout << " is A\n";
 
     lll_reduce(A);
 
-    A.print_pretty();
-    cout << " is reduced A\n";
+    // A.print_pretty();
+    // cout << " is reduced A\n";
 
     if (A.at(0, d).abs() == weight_y) {
       Mat ans(d, 1);
@@ -391,12 +391,12 @@ optional<Mat> short_solution(Mat A, Mat b, BigInt mask) {
 
   // x0.print_pretty();
   // cout << '\n';
-  R.print_pretty();
-  cout << '\n';
-  null_D.print_pretty();
-  cout << '\n';
-  lat.print_pretty();
-  cout << '\n';
+  // R.print_pretty();
+  // cout << '\n';
+  // null_D.print_pretty();
+  // cout << '\n';
+  // lat.print_pretty();
+  // cout << '\n';
 
   Mat ans(closest_vector_embedded(lat, x0, mask));
   return ans;
