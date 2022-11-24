@@ -1,41 +1,41 @@
 #include "solver.h"
 #include <cassert>
 #include <flint/fmpz_matxx.h>
+#include <iomanip>
 
 using namespace std;
 using namespace flint;
 
 typedef fmpz_matxx Mat;
 
-vector<term_desc> n_m_simple_terms(int n, int m, int num_inputs) {
-  vector<term_desc> result;
-  term_desc term_now;
-  int prefix_sum = 0;
+vector<TermDesc> n_m_simple_terms(int max_sum, int max_single, int num_inputs) {
+  vector<TermDesc> result;
+  TermDesc term_now;
 
-  function<void(int)> recursion = [&](int depth) -> void {
+  function<void(int, int)> recursion = [&](int depth, int prefix_sum) -> void {
     if (depth >= num_inputs) {
       result.push_back(term_now);
       return;
     }
-    if (term_now.size() >= num_inputs) {
-      result.push_back(term_now);
-      return;
-    }
-    int mn = min(prefix_sum - m, n);
+    // if (term_now.size() >= max_sum) {
+    //   result.push_back(term_now);
+    //   return;
+    // }
+    int mn = min(max_sum - prefix_sum, max_single);
     for (int i = 0; i <= mn; i++) {
+      recursion(depth + 1, prefix_sum + i);
       term_now.push_back(depth);
-      recursion(depth + 1);
     }
     for (int i = 0; i <= mn; i++) {
       term_now.pop_back();
     }
   };
 
-  recursion(0);
+  recursion(0, 0);
   return result;
 }
 
-BigInt calc_term(const vector<BigInt> &input, const term_desc &term,
+BigInt calc_term(const vector<BigInt> &input, const TermDesc &term,
                  BigInt mask) {
   BigInt res(1);
   for (int a : term) {
@@ -45,25 +45,31 @@ BigInt calc_term(const vector<BigInt> &input, const term_desc &term,
 }
 
 vector<BigInt> gen_row(const vector<BigInt> &inputs,
-                       const vector<term_desc> &terms, BigInt mask) {
+                       const vector<TermDesc> &terms, BigInt mask) {
   vector<BigInt> res;
-  for (const term_desc &term : terms) {
+  for (const TermDesc &term : terms) {
     res.push_back(calc_term(inputs, term, mask));
   }
   return res;
 }
 
-void add_c_row_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask) {
+void add_c_row_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask, bool use_mask = true) {
   int cols = A.cols();
   for (int k = 0; k < cols; k++) {
-    A.at(j, k) = (A.at(j, k) + c * A.at(i, k)) & mask;
+    A.at(j, k) = A.at(j, k) + c * A.at(i, k);
+    if (use_mask) {
+      A.at(j, k) = A.at(j, k) & mask;
+    }
   }
 }
 
-void add_c_col_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask) {
+void add_c_col_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask, bool use_mask = true) {
   int rows = A.rows();
   for (int k = 0; k < rows; k++) {
-    A.at(k, j) = (A.at(k, j) + c * A.at(k, i)) & mask;
+    A.at(k, j) = (A.at(k, j) + c * A.at(k, i));
+    if (use_mask) {
+      A.at(k, j) = A.at(k, j) & mask;
+    }
   }
 }
 
@@ -95,7 +101,7 @@ bool elim_col(Mat &A, Mat &L, int now, BigInt mask) {
         BigInt c(A.at(i, now) / A.at(now, now));
         BigInt neg_c(negmod(c, mask + 1));
         add_c_row_i_to_j(A, now, i, neg_c, mask);
-        add_c_row_i_to_j(L, now, i, neg_c, mask);
+        add_c_row_i_to_j(L, now, i, neg_c, mask, false);
         if (A.at(i, now) == 0) {
           break;
         }
@@ -117,7 +123,7 @@ bool elim_row(Mat &A, Mat &R, int now, BigInt mask) {
         BigInt c(A.at(now, i) / A.at(now, now));
         BigInt neg_c(mask + 1 - c);
         add_c_col_i_to_j(A, now, i, neg_c, mask);
-        add_c_col_i_to_j(R, now, i, neg_c, mask);
+        add_c_col_i_to_j(R, now, i, neg_c, mask, false);
         if (A.at(now, i) == 0) {
           break;
         }
@@ -146,7 +152,7 @@ bool make_pivot(Mat &A, Mat &L, Mat &R, int now) {
   return false;
 }
 
-// return {D, L, R};
+// return {D, L, R}
 // D = L A R
 std::tuple<Mat, Mat, Mat> smith_normal_form(Mat A, BigInt mask) {
   int rows = A.rows();
@@ -189,7 +195,9 @@ void lll_reduce(Mat &L) {
 Mat closest_vector_embedded(Mat L, Mat y, BigInt mask) {
   int d = L.cols();
 
-  Mat A(d + 1, d + 1);
+  int rounds = 100;
+
+  Mat A(d + 1, d + 1 + rounds);
 
   for (int i = 0; i < d; i++) {
     for (int j = 0; j < d; j++) {
@@ -201,32 +209,45 @@ Mat closest_vector_embedded(Mat L, Mat y, BigInt mask) {
     A.at(d, i) = y.at(i, 0);
   }
 
-  // lll_reduce(L);
-  // L.print_pretty();
-  // cout << '\n';
+  // for (int i = 0; i < d; i++) {
+  //   A.at(i, d + i) = 1;
+  // }
 
-  BigInt M(mask.sqrt());
-  // BigInt M(100);
-  A.at(d, d) = M;
+  // BigInt M(mask.sqrt());
+  BigInt weight(mask);
+  BigInt weight_y(mask.sqrt());
+  A.at(d, d) = weight_y;
 
-  lll_reduce(A);
+  lll_reduce(L);
+  L.print_pretty();
+  cout << " is reduced L\n";
 
-  // A.print_pretty();
-  // cout << '\n';
+  for (int t = 0; t < rounds; t++) {
+    cout << "----------" << t << "----------\n";
 
-  Mat ans(d, 1);
-  for (int i = 0; i < d + 1; i++) {
-    if (A.at(i, d) == M) {
-      for (int j = 0; j < d; j++) {
-        ans.at(j, 0) = A.at(i, j);
+    A.print_pretty();
+    cout << " is A\n";
+
+    lll_reduce(A);
+
+    A.print_pretty();
+    cout << " is reduced A\n";
+
+    if (A.at(0, d).abs() == weight_y) {
+      Mat ans(d, 1);
+      if (A.at(0, d) == weight_y) {
+        for (int j = 0; j < d; j++) {
+          ans.at(j, 0) = A.at(0, j);
+        }
+      } else {
+        for (int j = 0; j < d; j++) {
+          ans.at(j, 0) = -A.at(0, j);
+        }
       }
       return ans;
     }
-    if (A.at(i, d) == -M) {
-      for (int j = 0; j < d; j++) {
-        ans.at(j, 0) = A.at(i, j);
-      }
-      return ans;
+    else {
+      A.at(0, d + 1 + t) = weight;
     }
   }
   return y;
@@ -316,6 +337,11 @@ optional<Mat> short_solution(Mat A, Mat b, BigInt mask) {
   Mat y(cols, 1);
   Mat null_D(Mat::one(cols, cols));
 
+  // D.print_pretty();
+  // cout << '\n';
+  // z.print_pretty();
+  // cout << '\n';
+
   for (int i = 0; i < mn; i++) {
     BigInt d(D.at(i, i));
     BigInt zi(z.at(i, 0));
@@ -343,25 +369,44 @@ optional<Mat> short_solution(Mat A, Mat b, BigInt mask) {
     null_D.at(i, i) = BigInt((mask + 1) / gcd_d);
   }
 
+  for (int i = mn; i < cols; i++) {
+    if (z.at(i, 0) != 0) {
+      return nullopt;
+    }
+  }
+
   Mat x0(R * y);
   for (int i = 0; i < cols; i++) {
     x0.at(i, 0) = x0.at(i, 0) & mask;
   }
 
+  Mat lat((R * null_D).transpose());
+
+  // for (int i = 0; i < cols; i++) {
+  //   for (int j = 0; j < cols; j++) {
+  //     cout << setw(5) << R.at(i, j);
+  //   }
+  //   cout << '\n';
+  // }
+
   // x0.print_pretty();
   // cout << '\n';
-  // R.print_pretty();
-  // cout << '\n';
-  // null_D.print_pretty();
-  // cout << '\n';
+  R.print_pretty();
+  cout << '\n';
+  null_D.print_pretty();
+  cout << '\n';
+  lat.print_pretty();
+  cout << '\n';
 
-  Mat lat((R * null_D).transpose());
-  Mat ans_a(closest_vector_embedded(lat, x0, mask));
-  Mat ans_b(closest_vector_babai(lat, x0, mask));
+  Mat ans(closest_vector_embedded(lat, x0, mask));
+  return ans;
+
+  // Mat ans_a(closest_vector_embedded(lat, x0, mask));
+  // Mat ans_b(closest_vector_babai(lat, x0, mask));
   // ans_a.print_pretty();
   // ans_b.print_pretty();
-  assert(ans_a == ans_b);
-  return ans_a;
+  // assert(ans_a == ans_b);
+  // return ans_a;
 }
 
 BigInt to_mask(int bit_width) {
@@ -370,21 +415,74 @@ BigInt to_mask(int bit_width) {
   return BigInt(ans - 1);
 }
 
+string Solver::m_print_term(TermDesc term, BigInt coeff = BigInt(1)) {
+  assert(coeff != 0);
+  if (term.empty()) {
+    return coeff.to_string();
+  }
+  stringstream term_ss;
+  bool tail = false;
+  if (coeff != 1) {
+    term_ss << coeff;
+    tail = true;
+  }
+  for (int l = 0, r = 0; l < term.size(); l = r) {
+    while (r < term.size() && term[r] == term[l]) {
+      r++;
+    }
+
+    stringstream power;
+    power << m_input_names[term[l]];
+    if (r - l != 1) {
+      power << " ** " << r - l;
+    }
+
+    if (tail) {
+      term_ss << " * " << power.str();
+    } else {
+      term_ss << power.str();
+      tail = true;
+    }
+  }
+  return term_ss.str();
+}
+
+string Solver::m_print_terms(vector<TermDesc> terms, vector<BigInt> coeffs) {
+  stringstream terms_ss;
+  bool tail = false;
+  for (int i = 0; i < terms.size(); i++) {
+    if (coeffs[i] != 0) {
+      if (tail) {
+        if (coeffs[i] < 0) {
+          terms_ss << " - " << m_print_term(terms[i], BigInt(-coeffs[i]));
+        } else {
+          terms_ss << " + " << m_print_term(terms[i], coeffs[i]);
+        }
+      } else {
+        terms_ss << m_print_term(terms[i], coeffs[i]);
+        tail = true;
+      }
+    }
+  }
+  return terms_ss.str();
+}
+
 void Solver::def_input(string name, int bit_width) {
-  InputDesc desc{m_num_inputs, to_mask(bit_width)};
+  InputDesc desc{m_input_size(), to_mask(bit_width)};
   m_input_descs[name] = desc;
-  m_num_inputs++;
+  m_input_names.push_back(name);
 }
 
 void Solver::def_output(string name, int bit_width) {
-  OutputDesc desc{m_num_outputs, to_mask(bit_width)};
+  OutputDesc desc{m_output_size(), to_mask(bit_width)};
   m_output_descs[name] = desc;
-  m_num_outputs++;
+  m_output_names.push_back(name);
 }
 
 void Solver::add_sample(map<string, BigInt> inputs,
                         map<string, BigInt> outputs) {
-  Sample sample{vector<BigInt>(m_num_inputs), vector<BigInt>(m_num_outputs)};
+  Sample sample{vector<BigInt>(m_input_size()),
+                vector<BigInt>(m_output_size())};
   for (auto [name, desc] : m_input_descs) {
     sample.inputs[desc.loc] = inputs[name];
   }
@@ -394,6 +492,38 @@ void Solver::add_sample(map<string, BigInt> inputs,
   m_samples.push_back(sample);
 }
 
-void Solver::solve_output(std::string name) {}
+void Solver::solve_output(std::string name) {
+  int loc = m_output_descs[name].loc;
+  BigInt mask = m_output_descs[name].mask;
+
+  vector<TermDesc> terms = n_m_simple_terms(3, 3, m_input_size());
+
+  for (TermDesc term : terms) {
+    cout << m_print_term(term) << '\n';
+  }
+  cout << '\n';
+
+  int cols = terms.size();
+  int rows = m_samples.size();
+  Mat A(rows, cols);
+  Mat b(rows, 1);
+  for (int i = 0; i < rows; i++) {
+    vector<BigInt> row_inputs = gen_row(m_samples[i].inputs, terms, mask);
+    BigInt row_output = m_samples[i].outputs[loc];
+    for (int j = 0; j < cols; j++) {
+      A.at(i, j) = row_inputs[j];
+    }
+    b.at(i, 0) = row_output;
+  }
+
+  auto coeffs = short_solution(A, b, mask);
+  if (coeffs) {
+    cout << "Solved\n";
+    coeffs->print_pretty();
+    cout << '\n';
+  } else {
+    cout << "No solution\n";
+  }
+}
 
 void Solver::solve() {}

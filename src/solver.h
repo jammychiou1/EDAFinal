@@ -11,7 +11,7 @@
 #include <flint/fmpzxx.h>
 
 typedef flint::fmpzxx BigInt;
-typedef std::vector<int> term_desc;
+typedef std::vector<int> TermDesc;
 
 std::optional<flint::fmpz_matxx>
 short_solution(flint::fmpz_matxx A, flint::fmpz_matxx b, BigInt mask);
@@ -31,11 +31,19 @@ private:
     std::vector<BigInt> outputs;
   };
 
-  int m_num_inputs = 0;
-  int m_num_outputs = 0;
   std::map<std::string, InputDesc> m_input_descs;
   std::map<std::string, OutputDesc> m_output_descs;
+  std::vector<std::string> m_input_names;
+  std::vector<std::string> m_output_names;
   std::vector<Sample> m_samples;
+
+  int m_input_size() { return m_input_names.size(); }
+
+  int m_output_size() { return m_output_names.size(); }
+
+  std::string m_print_term(TermDesc term, BigInt coeff);
+  std::string m_print_terms(std::vector<TermDesc> terms,
+                            std::vector<BigInt> coeffs);
 
 public:
   void def_input(std::string name, int bit_width);
