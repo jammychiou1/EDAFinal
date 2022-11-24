@@ -53,7 +53,8 @@ vector<BigInt> gen_row(const vector<BigInt> &inputs,
   return res;
 }
 
-void add_c_row_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask, bool use_mask = true) {
+void add_c_row_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask,
+                      bool use_mask = true) {
   int cols = A.cols();
   for (int k = 0; k < cols; k++) {
     A.at(j, k) = A.at(j, k) + c * A.at(i, k);
@@ -63,7 +64,8 @@ void add_c_row_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask, bool use_mask
   }
 }
 
-void add_c_col_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask, bool use_mask = true) {
+void add_c_col_i_to_j(Mat &A, int i, int j, BigInt c, BigInt mask,
+                      bool use_mask = true) {
   int rows = A.rows();
   for (int k = 0; k < rows; k++) {
     A.at(k, j) = (A.at(k, j) + c * A.at(k, i));
@@ -245,8 +247,7 @@ Mat closest_vector_embedded(Mat L, Mat y, BigInt mask) {
         }
       }
       return ans;
-    }
-    else {
+    } else {
       A.at(0, d + 1 + t) = weight;
     }
   }
