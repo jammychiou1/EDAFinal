@@ -47,8 +47,8 @@ public:
   void def_output(std::string name, int bit_width);
   void add_sample(std::map<std::string, BigInt> inputs,
                   std::map<std::string, BigInt> outputs);
-  void solve_output(std::string name);
-  void solve();
+  bool solve_output(std::string name);
+  bool solve();
 };
 
 #endif // __SOLVER_H__

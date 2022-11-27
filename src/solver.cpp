@@ -180,7 +180,10 @@ std::tuple<Mat, Mat, Mat> smith_normal_form(Mat A, BigInt mask) {
 }
 
 void lll_reduce(Mat &L) {
-  fmpqxx delta(75, 100u), eta(51, 100u);
+  // L.print_pretty();
+  // cout << '\n';
+
+  fmpqxx delta(99, 100u), eta(51, 100u);
   fmpz_mat_lll_storjohann(L._mat(), delta._fmpq(), eta._fmpq());
 
   // L.print_pretty();
@@ -197,7 +200,7 @@ void lll_reduce(Mat &L) {
 Mat closest_vector_embedded(Mat L, Mat y, BigInt mask) {
   int d = L.cols();
 
-  int rounds = 100;
+  int rounds = 10;
 
   Mat A(d + 1, d + 1 + rounds);
 
@@ -329,7 +332,10 @@ optional<Mat> short_solution(Mat A, Mat b, BigInt mask) {
     z.at(i, 0) = BigInt(z.at(i, 0) & mask);
   }
 
+  // b.print_pretty();
+  // cout << '\n';
   // z.print_pretty();
+  // cout << '\n';
 
   int rows = A.rows();
   int cols = A.cols();
@@ -370,7 +376,7 @@ optional<Mat> short_solution(Mat A, Mat b, BigInt mask) {
     null_D.at(i, i) = BigInt((mask + 1) / gcd_d);
   }
 
-  for (int i = mn; i < cols; i++) {
+  for (int i = mn; i < rows; i++) {
     if (z.at(i, 0) != 0) {
       return nullopt;
     }
@@ -493,16 +499,18 @@ void Solver::add_sample(map<string, BigInt> inputs,
   m_samples.push_back(sample);
 }
 
-void Solver::solve_output(std::string name) {
+bool Solver::solve_output(std::string name) {
   int loc = m_output_descs[name].loc;
   BigInt mask = m_output_descs[name].mask;
+
+  // cout << mask << '\n';
 
   vector<TermDesc> terms = n_m_simple_terms(3, 3, m_input_size());
 
   // for (TermDesc term : terms) {
   //   cout << m_print_term(term) << '\n';
   // }
-  // cout << '\n';
+  // cout << endl;
 
   int cols = terms.size();
   int rows = m_samples.size();
@@ -517,14 +525,27 @@ void Solver::solve_output(std::string name) {
     b.at(i, 0) = row_output;
   }
 
+  // A.print_pretty();
+  // cout << '\n';
+
   auto coeffs = short_solution(A, b, mask);
   if (coeffs) {
     cout << "Solved\n";
     coeffs->print_pretty();
     cout << '\n';
+    return true;
   } else {
     cout << "No solution\n";
+    return false;
   }
 }
 
-void Solver::solve() {}
+bool Solver::solve() {
+  for (auto [name, desc] : m_output_descs) {
+    cout << name << '\n';
+    if (!solve_output(name)) {
+      return false;
+    }
+  }
+  return true;
+}

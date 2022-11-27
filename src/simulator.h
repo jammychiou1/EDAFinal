@@ -16,7 +16,7 @@ public:
   ~Simulator(){};
 
   void generate_output(map<string, vector<bitvec>> &);
-  void generate_input(string fixed = "", int val = -1, int num = 1000);
+  void generate_input(int num = 1000, string fixed = "", int val = -1);
   void read(const string &);
   pair<string, int> find_smallest_input();
   vector<pair<string, int>> input_info;

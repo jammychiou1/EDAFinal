@@ -18,8 +18,8 @@ void Simulator::generate_output(map<string, vector<bitvec>> &testcase) {
           in->ins[0]->value = tmp;
           process.push(in->ins[0]);
         } else {
-          // from [[0, 1, 1], [1, 0, 1], [1, 0, 0]] to [0, 1, 1], [1, 0, 0], [1,
-          // 1, 0]
+          // from [[0, 1, 1], [1, 0, 1], [1, 0, 0]]
+          // to [0, 1, 1], [1, 0, 0], [1, 1, 0]
           for (int i = 0; i < in->width; i++) {
             bitvec tmp;
             for (size_t j = 0; j < it->second.size(); j++) {
@@ -195,7 +195,7 @@ void Simulator::print_val(string name, bitvec data) {
   cout << endl;
 }
 
-void Simulator::generate_input(string fixed, int val, int num) {
+void Simulator::generate_input(int num, string fixed, int val) {
   if (DEBUG_MSG)
     cout << "start generating inputs..." << endl;
   input_testcase.clear();
