@@ -195,7 +195,7 @@ void Simulator::print_val(string name, bitvec data) {
   cout << endl;
 }
 
-void Simulator::generate_input(int num, string fixed, int val) {
+void Simulator::generate_input(int num, string fixed, long long val) {
   if (DEBUG_MSG)
     cout << "start generating inputs..." << endl;
   input_testcase.clear();

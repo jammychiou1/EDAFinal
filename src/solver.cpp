@@ -224,8 +224,8 @@ Mat closest_vector_embedded(Mat L, Mat y, BigInt mask) {
   A.at(d, d) = weight_y;
 
   lll_reduce(L);
-  // L.print_pretty();
-  // cout << " is reduced L\n";
+  L.print_pretty();
+  cout << " is reduced L\n";
 
   for (int t = 0; t < rounds; t++) {
     // cout << "----------" << t << "----------\n";
@@ -526,6 +526,8 @@ bool Solver::solve_output(std::string name) {
   }
 
   // A.print_pretty();
+  // cout << '\n';
+  // b.print_pretty();
   // cout << '\n';
 
   auto coeffs = short_solution(A, b, mask);

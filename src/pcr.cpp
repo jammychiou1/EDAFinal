@@ -7,6 +7,8 @@
 
 using std::string;
 
+const int n_samples = 1000;
+
 BigInt bitvec_to_bigint(bitvec v) {
   BigInt ans(0);
   for (int i = 0; i < v.size(); i++) {
@@ -18,24 +20,13 @@ BigInt bitvec_to_bigint(bitvec v) {
   return ans;
 }
 
-bool polynomial_coefficient_recovering(string in_file, string out_file) {
-  Simulator simulator;
-  // argc < 2 ? simulator.read("release/test01/top_primitive.v") :
-  // simulator.read(argv[1]);
-  simulator.read(in_file);
-  // cout << "generating inputs..." << endl;
-
-  int n_samples = 1000;
-  simulator.generate_input(n_samples);
-  cout << "input generated\nstart generating outputs..." << endl;
-  simulator.generate_output(simulator.input_testcase);
-  cout << "output generated\nstart solving..." << endl;
-
-  // auto result = solve(simulator.input_testcase, simulator.output_testcase);
-
+Solver make_solver(Simulator &simulator, string control_input = "") {
   Solver solver;
+
   for (auto [name, samples] : simulator.input_testcase) {
-    solver.def_input(name, samples[0].size());
+    if (name != control_input) {
+      solver.def_input(name, samples[0].size());
+    }
   }
   for (auto [name, samples] : simulator.output_testcase) {
     solver.def_output(name, samples[0].size());
@@ -44,17 +35,80 @@ bool polynomial_coefficient_recovering(string in_file, string out_file) {
     map<string, BigInt> inputs;
     map<string, BigInt> outputs;
     for (auto [name, samples] : simulator.input_testcase) {
-      inputs[name] = bitvec_to_bigint(samples[t]);
+      if (name != control_input) {
+        inputs[name] = bitvec_to_bigint(samples[t]);
+      }
     }
     for (auto [name, samples] : simulator.output_testcase) {
       outputs[name] = bitvec_to_bigint(samples[t]);
     }
     solver.add_sample(inputs, outputs);
   }
+  return solver;
+}
 
-  bool result = solver.solve();
-  if (result) {
-    cout << "solved by Polynomial Coefficient Recovering" << endl;
+bool pcr_case(Simulator &simulator, string name, int width) {
+  if (width > 15) {
+    cout << "Too many cases\n";
+    return false;
   }
-  // Converter converter(simulator.input_info, simulator.output_info);
+
+  long long sz = width == -1 ? 0 : (1ll << width);
+  for (long long i = 0; i < sz; i++) {
+    cout << name << ": " << i << '\n';
+    simulator.generate_input(n_samples, name, i);
+    simulator.generate_output(simulator.input_testcase);
+    Solver case_solver = make_solver(simulator, name);
+    bool case_result = case_solver.solve();
+    if (!case_result) {
+      return false;
+    }
+    // converter.convert_control(output, sep_result.second,
+    // possibly_control.first,
+    //                           i);
+  }
+  return true;
+}
+
+bool pcr_cases(Simulator &simulator) {
+  for (auto in : simulator.getIns()) {
+    string name = in->name;
+    int width = in->width;
+    cout << "Testing with control input " << name << '\n';
+
+    if (pcr_case(simulator, name, width)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool pcr(Simulator &simulator) {
+  simulator.generate_input(n_samples);
+  cout << "Input generated\nStart generating outputs...\n";
+  simulator.generate_output(simulator.input_testcase);
+  cout << "Output generated\nStart solving...\n";
+
+  Solver solver = make_solver(simulator);
+
+  return solver.solve();
+}
+
+bool polynomial_coefficient_recovering(string in_file, string out_file) {
+  Simulator simulator;
+  // argc < 2 ? simulator.read("release/test01/top_primitive.v") :
+  // simulator.read(argv[1]);
+  simulator.read(in_file);
+  // cout << "generating inputs..." << endl;
+
+  if (pcr(simulator)) {
+    cout << "Solved by Polynomial Coefficient Recovering\n";
+    // Converter converter(simulator.input_info, simulator.output_info);
+    return true;
+  }
+  if (pcr_cases(simulator)) {
+    cout << "Solved by Polynomial Coefficient Recovering with Control Input\n";
+    return true;
+  }
+  return false;
 }
