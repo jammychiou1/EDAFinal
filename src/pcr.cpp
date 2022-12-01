@@ -53,7 +53,7 @@ bool pcr_case(Simulator &simulator, string name, int width) {
     return false;
   }
 
-  long long sz = width == -1 ? 0 : (1ll << width);
+  long long sz = width == -1 ? 1 : (1ll << width);
   for (long long i = 0; i < sz; i++) {
     cout << name << ": " << i << '\n';
     simulator.generate_input(n_samples, name, i);
