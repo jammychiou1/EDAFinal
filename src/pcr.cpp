@@ -5,110 +5,92 @@
 
 #include <iostream>
 
-using std::string;
+using namespace std;
 
 const int n_samples = 1000;
 
-BigInt bitvec_to_bigint(bitvec v) {
-  BigInt ans(0);
-  for (int i = 0; i < v.size(); i++) {
-    ans *= 2;
-    if (v[i]) {
-      ans += 1;
+BigInt bitvec_to_bigint(const BitVec &vec) {
+  BigInt bigInt(0);
+  for (int i = 0; i < vec.size(); i++) {
+    bigInt *= 2;
+    if (vec[i]) {
+      bigInt += 1;
     }
   }
-  return ans;
+  return bigInt;
 }
 
-Solver make_solver(Simulator &simulator, string control_input = "") {
-  Solver solver;
-
-  for (auto [name, samples] : simulator.input_testcase) {
-    if (name != control_input) {
-      solver.def_input(name, samples[0].size());
-    }
-  }
-  for (auto [name, samples] : simulator.output_testcase) {
-    solver.def_output(name, samples[0].size());
-  }
-  for (int t = 0; t < n_samples; t++) {
-    map<string, BigInt> inputs;
-    map<string, BigInt> outputs;
-    for (auto [name, samples] : simulator.input_testcase) {
-      if (name != control_input) {
-        inputs[name] = bitvec_to_bigint(samples[t]);
-      }
-    }
-    for (auto [name, samples] : simulator.output_testcase) {
-      outputs[name] = bitvec_to_bigint(samples[t]);
-    }
-    solver.add_sample(inputs, outputs);
-  }
-  return solver;
-}
-
-bool pcr_case(Simulator &simulator, string name, int width) {
-  if (width > 15) {
+bool pcr_case(string output_name, int output_width, string control_name, int control_width, Circuit &circuit, Converter &converter) {
+  if (control_width > 15) {
     cout << "Too many cases\n";
     return false;
   }
 
-  long long sz = width == -1 ? 1 : (1ll << width);
-  for (long long i = 0; i < sz; i++) {
-    cout << name << ": " << i << '\n';
-    simulator.generate_input(n_samples, name, i);
-    simulator.generate_output(simulator.input_testcase);
-    Solver case_solver = make_solver(simulator, name);
-    bool case_result = case_solver.solve();
+  map<string, int> input_widths = circuit.get_input_widths();
+  input_widths.erase(control_name);
+
+  Solver case_solver(input_widths, {{output_name, output_width}});
+
+  map<long long, string> expressions;
+  long long n_cases = control_width == -1 ? 1 : (1ll << control_width);
+  for (long long val = 0; val < n_cases; val++) {
+    cout << control_name << ": " << val << '\n';
+    auto [inputs, outputs] = circuit.generate_simulation(control_name, val);
+    auto case_result = case_solver.solve_output(output_name);
     if (!case_result) {
       return false;
     }
-    // converter.convert_control(output, sep_result.second,
-    // possibly_control.first,
-    //                           i);
+    expressions[val] = case_solver.format_formula(case_result.value());
   }
+  converter.write_output_cases(output_name, control_name, expressions);
   return true;
 }
 
-bool pcr_cases(Simulator &simulator) {
-  for (auto in : simulator.getIns()) {
-    string name = in->name;
-    int width = in->width;
-    cout << "Testing with control input " << name << '\n';
+bool pcr_cases(string output_name, int output_width, Circuit &circuit, Converter &converter) {
+  for (auto [control_name, control_width] : circuit.get_input_widths()) {
+    cout << "Testing with control input " << control_name << '\n';
 
-    if (pcr_case(simulator, name, width)) {
+    if (pcr_case(output_name, output_width, control_name, control_width, circuit, converter)) {
       return true;
     }
   }
   return false;
 }
 
-bool pcr(Simulator &simulator) {
-  simulator.generate_input(n_samples);
-  cout << "Input generated\nStart generating outputs...\n";
-  simulator.generate_output(simulator.input_testcase);
-  cout << "Output generated\nStart solving...\n";
+bool pcr(string output_name, int output_width, Circuit &circuit, Converter &converter) {
+  auto [inputs, outputs] = circuit.generate_simulation();
 
-  Solver solver = make_solver(simulator);
+  Solver solver(circuit.get_input_widths(), {{output_name, output_width}});
 
-  return solver.solve();
+  auto result = solver.solve_output(output_name);
+  if (!result) {
+    return false;
+  }
+  return true;
 }
 
 bool polynomial_coefficient_recovering(string in_file, string out_file) {
-  Simulator simulator;
-  // argc < 2 ? simulator.read("release/test01/top_primitive.v") :
-  // simulator.read(argv[1]);
-  simulator.read(in_file);
-  // cout << "generating inputs..." << endl;
+  Parser parser;
+  Circuit circuit = parser.parse(in_file);
+  auto input_widths = circuit.get_input_widths();
+  auto output_widths = circuit.get_output_widths();
 
-  if (pcr(simulator)) {
-    cout << "Solved by Polynomial Coefficient Recovering\n";
-    // Converter converter(simulator.input_info, simulator.output_info);
-    return true;
+  Converter converter(out_file, input_widths, output_widths);
+
+  converter.write_prologue();
+
+  for (const auto &[output_name, width] : circuit.get_output_widths()) {
+    cout << "Solving for " << output_name << " :\n";
+    if (bool result = pcr(output_name, width, circuit, converter); result) {
+      cout << "Solved by Polynomial Coefficient Recovering\n";
+      continue;
+    }
+    if (bool result = pcr_cases(output_name, width, circuit, converter); result) {
+      cout << "Solved by Polynomial Coefficient Recovering with Control Input\n";
+      continue;
+    }
+    cout << "Failed\n";
+    return false;
   }
-  if (pcr_cases(simulator)) {
-    cout << "Solved by Polynomial Coefficient Recovering with Control Input\n";
-    return true;
-  }
-  return false;
+  return true;
 }

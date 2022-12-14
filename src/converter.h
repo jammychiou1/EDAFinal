@@ -1,42 +1,37 @@
 #ifndef __CONVERTER_H__
 #define __CONVERTER_H__
 
-#include <bits/stdc++.h>
+#include <fstream>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include "simulator.h"
+#include "solver.h"
+
+// TODO: def and use join
 class Converter {
+ private:
+  void m_write_prologue_block(const std::map<std::string, int> &widths,
+                              std::string type);
 
-public:
-  Converter(std::vector<std::pair<std::string, int>> input_info,
-            std::vector<std::pair<std::string, int>> output_info) {
-    inputs = input_info;
-    outputs = output_info;
-    pre = false;
-    start_cond = false;
-  };
-  ~Converter(){};
-  void convert(std::string path,
-               std::vector<std::map<std::vector<int>, __int128>>);
+  std::map<std::string, int> m_input_widths;
+  std::map<std::string, int> m_output_widths;
+  std::ofstream m_file;
 
-  void
-  convert_control(std::string path,
-                  std::vector<std::map<std::vector<int>, __int128>> result = {},
-                  std::string control_input = "", int val = -1);
+ public:
+  Converter(std::string output_path, std::map<std::string, int> input_widths,
+            std::map<std::string, int> output_widths);
 
-  void prewrite(std::ofstream &file);
+  void write_prologue();
 
-  void inwrite(std::ofstream &file,
-               std::vector<std::map<std::vector<int>, __int128>> result,
-               std::string control_input = "", int val = -1);
+  void write_output_cases(std::string output_name, std::string control_input,
+                          const std::map<long long, std::string> &expressions);
 
-  void postwrite(std::ofstream &file);
+  void write_output(std::string output_name, const std::string &expression);
 
-  std::vector<std::pair<std::string, int>> inputs;
-  std::vector<std::pair<std::string, int>> outputs;
-
-private:
-  std::string generate_lines(std::vector<std::pair<std::string, int>> &,
-                             std::string type);
-  bool pre, start_cond;
+  void write_epilogue();
 };
 
-#endif
+#endif  // __CONVERTER_H__

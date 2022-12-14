@@ -1,4 +1,5 @@
 #include "solver.h"
+
 #include <bits/stdc++.h>
 #include <flint/fmpz_matxx.h>
 #include <flint/fmpzxx.h>
@@ -16,13 +17,9 @@ int main() {
   BigInt M(512);
   BigInt mask(M - 1);
 
-  Solver solver;
+  Solver solver({{"a", 9}, {"b", 9}, {"c", 9}}, {{"o1", 9}});
 
-  solver.def_input("a", 9);
-  solver.def_input("b", 9);
-  solver.def_input("c", 9);
-  solver.def_output("o1", 9);
-
+  vector<BigInt> as, bs, cs, o1s;
   for (int i = 0; i < n; i++) {
     BigInt a = BigInt::randm(state, M);
     BigInt b = BigInt::randm(state, M);
@@ -30,14 +27,19 @@ int main() {
     BigInt o1 = BigInt((69 + 2 * a + 4 * b + (M - 1) * c + 3 * a * b +
                         a * a * (M - 4) + 9 * (b * c) + (M - 5) * a * a * c) &
                        mask);
-    solver.add_sample(
-        {
-            {"a", a},
-            {"b", b},
-            {"c", c},
-        },
-        {{"o1", o1}});
+    as.push_back(a);
+    bs.push_back(b);
+    cs.push_back(c);
+    o1s.push_back(o1);
   }
 
-  solver.solve_output("o1");
+  solver.load_data(n,
+                   {
+                       {"a", as},
+                       {"b", bs},
+                       {"c", cs},
+                   },
+                   {{"o1", o1s}});
+  auto result = solver.solve_output("o1");
+  cout << solver.format_formula(result.value()) << '\n';
 }

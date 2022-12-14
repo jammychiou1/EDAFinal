@@ -7,48 +7,70 @@
 #include <utility>
 #include <vector>
 
-#include <flint/fmpz_matxx.h>
-#include <flint/fmpzxx.h>
+#include "circuit.h"
+#include "math_util.h"
 
-typedef flint::fmpzxx BigInt;
 typedef std::vector<int> TermDesc;
+typedef std::vector<std::pair<TermDesc, BigInt>> Formula;
 
 class Solver {
-private:
-  struct InputDesc {
-    int loc;
-    BigInt mask;
+ private:
+  struct Word {
+    int idx;
+    int width;
+    std::string name;
+
+    Word(int idx, int width, std::string name)
+        : idx(idx), width(width), name(name) {}
   };
-  struct OutputDesc {
-    int loc;
-    BigInt mask;
+
+  class WordLookup {
+   private:
+    std::vector<Word> m_words;
+    std::map<std::string, int> m_name_to_idx;
+
+   public:
+    int count(int idx) { return 0 <= idx && idx < m_words.size(); }
+    int count(std::string name) { return m_name_to_idx.count(name); }
+    int get_num_words() { return m_words.size(); }
+
+    void add_word(std::string name, int width) {
+      int idx = get_num_words();
+      m_words.emplace_back(idx, width, name);
+      m_name_to_idx[name] = idx;
+    }
+
+    Word &get_word(int idx) { return m_words[idx]; }
+    Word &get_word(std::string name) { return m_words[m_name_to_idx.at(name)]; }
+
+    typedef std::vector<Word>::iterator Iterator;
+    Iterator begin() { return m_words.begin(); }
+    Iterator end() { return m_words.end(); }
   };
+
   struct Sample {
     std::vector<BigInt> inputs;
     std::vector<BigInt> outputs;
   };
 
-  std::map<std::string, InputDesc> m_input_descs;
-  std::map<std::string, OutputDesc> m_output_descs;
-  std::vector<std::string> m_input_names;
-  std::vector<std::string> m_output_names;
+  WordLookup m_input_infos;
+  WordLookup m_output_infos;
+
   std::vector<Sample> m_samples;
 
-  int m_input_size() { return m_input_names.size(); }
+ public:
+  Solver(const std::map<std::string, int> &input_widths,
+         const std::map<std::string, int> &output_widths);
 
-  int m_output_size() { return m_output_names.size(); }
+  void load_data(int num_samples,
+                 const std::map<std::string, std::vector<BigInt>> &inputs,
+                 const std::map<std::string, std::vector<BigInt>> &outputs);
 
-  std::string m_print_term(TermDesc term, BigInt coeff);
-  std::string m_print_terms(std::vector<TermDesc> terms,
-                            std::vector<BigInt> coeffs);
+  std::optional<Formula> solve_output(std::string name);
+  // std::optional<std::map<std::string, Formula>> solve();
 
-public:
-  void def_input(std::string name, int bit_width);
-  void def_output(std::string name, int bit_width);
-  void add_sample(std::map<std::string, BigInt> inputs,
-                  std::map<std::string, BigInt> outputs);
-  bool solve_output(std::string name);
-  bool solve();
+  std::string format_term(const TermDesc &term, BigInt coeff = BigInt(1));
+  std::string format_formula(const Formula &formula);
 };
 
-#endif // __SOLVER_H__
+#endif  // __SOLVER_H__

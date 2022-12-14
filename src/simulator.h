@@ -1,32 +1,29 @@
 #ifndef __SIMULATOR_H__
 #define __SIMULATOR_H__
 
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "parser.h"
-#include <bits/stdc++.h>
+#include "solver.h"
 
-using namespace std;
+// TODO: remove this file
+class Simulator {
+ public:
+  void simulate(int num_samples, std::string fixed, long long val);
 
-class Simulator : public Parser {
-public:
-  Simulator() {
-    wires["1\'b0"] = new Based("1\'b0", NET);
-    wires["1\'b1"] = new Based("1\'b1", NET);
-  };
-  ~Simulator(){};
+  std::map<std::string, std::vector<BitVec>> input_testcase;
+  std::map<std::string, std::vector<BitVec>> output_testcase;
 
-  void generate_output(map<string, vector<bitvec>> &);
-  void generate_input(int num = 1000, string fixed = "", long long val = -1);
-  void read(const string &);
-  pair<string, int> find_smallest_input();
-  vector<pair<string, int>> input_info;
-  vector<pair<string, int>> output_info;
-  map<string, vector<bitvec>> input_testcase;
-  map<string, vector<bitvec>> output_testcase;
+ private:
+  void generate_output();
+  void generate_input(int num = 1000, std::string fixed = "",
+                      long long val = -1);
+  // BitVec calculate(GateType gateType, BitVec v1, BitVec v2 = {});
 
-private:
-  bitvec calculate(GateType gateType, bitvec v1, bitvec v2 = {});
-  void process_wire(string line);
-  void print_val(string name, bitvec);
+  int m_num_samples;
 };
 
-#endif
+#endif  // __SIMULATOR_H__

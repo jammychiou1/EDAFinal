@@ -1,17 +1,15 @@
-#include "solver.h"
 #include <bits/stdc++.h>
 #include <flint/fmpz_matxx.h>
 #include <flint/fmpzxx.h>
+
+#include "solver.h"
 using namespace std;
 
 typedef flint::fmpzxx BigInt;
 typedef flint::fmpz_matxx Mat;
 typedef flint::frandxx RandState;
 
-optional<Mat> short_solution(Mat A, Mat b, BigInt mask);
-
 int main() {
-
   RandState state;
 
   int n = 300;

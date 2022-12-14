@@ -1,20 +1,10 @@
 #include "converter.h"
-#include "linear.h"
 #include "parser.h"
 #include "pcr.h"
 #include "simulator.h"
 #include <bits/stdc++.h>
-#define METHOD_1 1
-#define METHOD_2 2
-#define CUR_METHOD 1
 
-void StructurallyEquivalentReduction(const string &input,
-                                     const string &output) {
-  Parser parser;
-  parser.read(input);
-  parser.strash();
-  parser.write(output);
-}
+using namespace std;
 
 int main(int argc, char **argv) {
   // std::ios::sync_with_stdio(false);
