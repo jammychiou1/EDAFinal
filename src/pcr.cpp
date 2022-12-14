@@ -1,7 +1,7 @@
 #include "pcr.h"
 #include "converter.h"
-#include "simulator.h"
 #include "solver.h"
+#include "parser.h"
 
 #include <iostream>
 

@@ -7,10 +7,9 @@
 #include <utility>
 #include <vector>
 
-#include "simulator.h"
 #include "solver.h"
 
-// TODO: def and use join
+// TODO: def and use string util join()
 class Converter {
  private:
   void m_write_prologue_block(const std::map<std::string, int> &widths,

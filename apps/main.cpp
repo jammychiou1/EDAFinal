@@ -1,7 +1,6 @@
 #include "converter.h"
 #include "parser.h"
 #include "pcr.h"
-#include "simulator.h"
 #include <bits/stdc++.h>
 
 using namespace std;
