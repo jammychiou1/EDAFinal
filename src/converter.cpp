@@ -8,7 +8,7 @@ Converter::Converter(string output_path, map<string, int> input_widths,
                      map<string, int> output_widths) {
   m_input_widths = input_widths;
   m_output_widths = output_widths;
-  m_file.open(output_path, ios_base::app);
+  m_file.open(output_path);
 };
 
 void Converter::m_write_prologue_block(const map<string, int> &widths,

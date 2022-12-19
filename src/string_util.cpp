@@ -37,6 +37,7 @@ vector<string> split(const string &str, const string &delim) {
       result.push_back(slice(str, l, str.size()));
       break;
     }
+    result.push_back(slice(str, l, r));
     l = r + delim.size();
   }
   return result;

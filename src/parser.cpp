@@ -22,8 +22,8 @@ const string output_keyword = "output";
 const string wire_keyword = "wire";
 
 Circuit Parser::parse(const string &file_name) {
-  circuit.add_word(bit_0, -1);
-  circuit.add_word(bit_1, -1);
+  circuit.def_const(bit_0, -1, 0);
+  circuit.def_const(bit_1, -1, 1);
 
   ifstream file(file_name);
   if (!file) {
@@ -38,6 +38,7 @@ Circuit Parser::parse(const string &file_name) {
     }
     if (starts_with(line, endmodule_keyword)) {
       circuit.commit();
+      // Circuit result = std::move(circuit);
       return std::move(circuit);
     }
     if (starts_with(line, input_keyword)) {
@@ -59,7 +60,7 @@ Circuit Parser::parse(const string &file_name) {
 
 pair<int, string> Parser::process_word_desc(string line) {
   if (line.front() == '[') {
-    size_t right = line.find(']');
+    size_t right = line.find("]");
     string word_desc = slice(line, 1, right);
     string remain = trim(slice(line, right + 1, line.size()));
     vector<string> result = split(word_desc, ":");
@@ -98,7 +99,7 @@ void Parser::process_output(string line) {
 }
 
 void Parser::process_wire(string line) {
-  line = trim(slice(line, output_keyword.size(), line.size()));
+  line = trim(slice(line, wire_keyword.size(), line.size()));
   auto [width, remain] = process_word_desc(line);
 
   vector<string> names = split(remain, ",");
@@ -134,7 +135,7 @@ void Parser::process_gate(string line) {
   vector<string> names = split(params, ",");
   for_each(names.begin(), names.end(), [](string &s) { s = trim(s); });
 
-  string input_name = names[0];
-  vector<string> output_names(names.begin() + 1, names.end());
-  circuit.add_gate(name, type, input_name, output_names);
+  string output_name = names[0];
+  vector<string> input_names(names.begin() + 1, names.end());
+  circuit.add_gate(name, type, output_name, input_names);
 }
