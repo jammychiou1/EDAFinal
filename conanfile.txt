@@ -1,6 +1,0 @@
-[requires]
-flint/2.8.1
-
-[generators]
-CMakeDeps
-CMakeToolchain
