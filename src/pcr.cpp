@@ -76,7 +76,16 @@ bool polynomial_coefficient_recovering(string in_file, string out_file) {
   auto input_widths = circuit.get_input_widths();
   auto output_widths = circuit.get_output_widths();
 
-  if (input_widths.size() > 10) {
+  cout << "input widths:\n";
+  for (const auto &[input_name, width] : circuit.get_input_widths()) {
+    cout << "  " << input_name << ": " << width << '\n';
+  }
+  cout << "output widths:\n";
+  for (const auto &[output_name, width] : circuit.get_output_widths()) {
+    cout << "  " << output_name << ": " << width << '\n';
+  }
+
+  if (input_widths.size() > 20) {
     cout << "Too many inputs\n";
     return false;
   }

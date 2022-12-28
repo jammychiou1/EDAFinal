@@ -1,0 +1,876 @@
+test01
+input widths:
+  in1: 4
+  in2: 4
+  in3: 4
+output widths:
+  out1: 4
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, out1);
+  input [3:0] in1;
+  input [3:0] in2;
+  input [3:0] in3;
+  output [3:0] out1;
+  wire [3:0] in1;
+  wire [3:0] in2;
+  wire [3:0] in3;
+  wire [3:0] out1;
+  assign out1 = in3 + in2 + in1;
+endmodule
+
+test02
+input widths:
+  in1: 4
+  in2: 4
+  in3: 4
+output widths:
+  out1: 4
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, out1);
+  input [3:0] in1;
+  input [3:0] in2;
+  input [3:0] in3;
+  output [3:0] out1;
+  wire [3:0] in1;
+  wire [3:0] in2;
+  wire [3:0] in3;
+  wire [3:0] out1;
+  assign out1 = in3 + in1 * in2;
+endmodule
+
+test03
+input widths:
+  in1: 19
+  in2: 19
+  in3: 19
+output widths:
+  out1: 20
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, out1);
+  input [18:0] in1;
+  input [18:0] in2;
+  input [18:0] in3;
+  output [19:0] out1;
+  wire [18:0] in1;
+  wire [18:0] in2;
+  wire [18:0] in3;
+  wire [19:0] out1;
+  assign out1 = 102 + in3 + in2 + in1;
+endmodule
+
+test04
+input widths:
+  in1: 16
+  in2: 16
+  in3: 16
+  in4: 16
+  in5: 16
+output widths:
+  out1: 17
+  out2: 17
+  out3: 34
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+Solving for out2:
+Solved
+Solved by Polynomial Coefficient Recovering
+Solving for out3:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, in4, in5, out1, out2, out3);
+  input [15:0] in1;
+  input [15:0] in2;
+  input [15:0] in3;
+  input [15:0] in4;
+  input [15:0] in5;
+  output [16:0] out1;
+  output [16:0] out2;
+  output [33:0] out3;
+  wire [15:0] in1;
+  wire [15:0] in2;
+  wire [15:0] in3;
+  wire [15:0] in4;
+  wire [15:0] in5;
+  wire [16:0] out1;
+  wire [16:0] out2;
+  wire [33:0] out3;
+  assign out1 = in2 + in1;
+  assign out2 = in3 - in2 - in1;
+  assign out3 = in5 + in1 * in4 + in1 * in3 + in1 * in2;
+endmodule
+
+test05
+input widths:
+  in1: 16
+  in2: 16
+  in3: 16
+  in4: 16
+output widths:
+  out1: 34
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, in4, out1);
+  input [15:0] in1;
+  input [15:0] in2;
+  input [15:0] in3;
+  input [15:0] in4;
+  output [33:0] out1;
+  wire [15:0] in1;
+  wire [15:0] in2;
+  wire [15:0] in3;
+  wire [15:0] in4;
+  wire [33:0] out1;
+  assign out1 = 789 * in4 + in3 + 456 * in2 + 123 * in1;
+endmodule
+
+test06
+input widths:
+  in1: 32
+  in2: 32
+  in3: 32
+output widths:
+  out1: 65
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, out1);
+  input [31:0] in1;
+  input [31:0] in2;
+  input [31:0] in3;
+  output [64:0] out1;
+  wire [31:0] in1;
+  wire [31:0] in2;
+  wire [31:0] in3;
+  wire [64:0] out1;
+  assign out1 = in3 + in2 + in1 * in1;
+endmodule
+
+test07
+input widths:
+  in1: 16
+  in2: 16
+  in3: 16
+  in4: 2
+output widths:
+  out1: 32
+Solving for out1:
+No solution
+Testing with control input in1
+Too many cases
+Testing with control input in2
+Too many cases
+Testing with control input in3
+Too many cases
+Testing with control input in4
+in4: 0
+Solved
+in4: 1
+Solved
+in4: 2
+Solved
+in4: 3
+Solved
+Solved by Polynomial Coefficient Recovering with Control Input
+module top(in1, in2, in3, in4, out1);
+  input [15:0] in1;
+  input [15:0] in2;
+  input [15:0] in3;
+  input [1:0] in4;
+  output [31:0] out1;
+  wire [15:0] in1;
+  wire [15:0] in2;
+  wire [15:0] in3;
+  wire [1:0] in4;
+  wire [31:0] out1;
+  assign out1 =
+    in4 == 0 ? 0 :
+    in4 == 1 ? in2 * in3 :
+    in4 == 2 ? in1 * in3 :
+    in4 == 3 ? in1 * in2 :
+    0; // should never happen
+endmodule
+
+test08
+input widths:
+  in1: 32
+  in2: 32
+  in3: 32
+  in4: 6
+  in5: 6
+output widths:
+  out1: 64
+Solving for out1:
+No solution
+Testing with control input in1
+Too many cases
+Testing with control input in2
+Too many cases
+Testing with control input in3
+Too many cases
+Testing with control input in4
+in4: 0
+No solution
+Testing with control input in5
+in5: 0
+No solution
+Failed
+module top(in1, in2, in3, in4, in5, out1);
+  input [31:0] in1;
+  input [31:0] in2;
+  input [31:0] in3;
+  input [5:0] in4;
+  input [5:0] in5;
+  output [63:0] out1;
+  wire [31:0] in1;
+  wire [31:0] in2;
+  wire [31:0] in3;
+  wire [5:0] in4;
+  wire [5:0] in5;
+  wire [63:0] out1;
+
+test09
+input widths:
+  in1: 32
+  in2: 32
+  in3: 32
+output widths:
+  out2: 41
+Solving for out2:
+No solution
+Testing with control input in1
+Too many cases
+Testing with control input in2
+Too many cases
+Testing with control input in3
+Too many cases
+Failed
+module top(in1, in2, in3, out2);
+  input [31:0] in1;
+  input [31:0] in2;
+  input [31:0] in3;
+  output [40:0] out2;
+  wire [31:0] in1;
+  wire [31:0] in2;
+  wire [31:0] in3;
+  wire [40:0] out2;
+
+test10
+input widths:
+  in1: 16
+  in2: 16
+  in3: 16
+output widths:
+  out1: 32
+  out2: 32
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+Solving for out2:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, out1, out2);
+  input [15:0] in1;
+  input [15:0] in2;
+  input [15:0] in3;
+  output [31:0] out1;
+  output [31:0] out2;
+  wire [15:0] in1;
+  wire [15:0] in2;
+  wire [15:0] in3;
+  wire [31:0] out1;
+  wire [31:0] out2;
+  assign out1 = 1 + in3 + in1 * in2;
+  assign out2 = -1 + in3 + in1 * in2;
+endmodule
+
+test11
+input widths:
+  in1: 8
+  in2: 8
+  in3: 8
+output widths:
+  out1: 24
+  out2: 16
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+Solving for out2:
+Solved
+Solved by Polynomial Coefficient Recovering
+module top(in1, in2, in3, out1, out2);
+  input [7:0] in1;
+  input [7:0] in2;
+  input [7:0] in3;
+  output [23:0] out1;
+  output [15:0] out2;
+  wire [7:0] in1;
+  wire [7:0] in2;
+  wire [7:0] in3;
+  wire [23:0] out1;
+  wire [15:0] out2;
+  assign out1 = in1 * in1 * in1;
+  assign out2 = in1 * in3;
+endmodule
+
+test12
+input widths:
+  in1: 11
+  in10: 11
+  in11: 11
+  in12: 11
+  in13: 11
+  in14: 11
+  in15: 11
+  in16: 11
+  in17: 11
+  in18: 11
+  in19: 11
+  in2: 11
+  in20: 11
+  in21: 11
+  in22: 11
+  in23: 11
+  in24: 11
+  in3: 11
+  in4: 11
+  in5: 11
+  in6: 11
+  in7: 11
+  in8: 11
+  in9: 11
+output widths:
+  out1: 26
+Too many inputs
+module top(in1, in2, in3, out1, out2);
+  input [7:0] in1;
+  input [7:0] in2;
+  input [7:0] in3;
+  output [23:0] out1;
+  output [15:0] out2;
+  wire [7:0] in1;
+  wire [7:0] in2;
+  wire [7:0] in3;
+  wire [23:0] out1;
+  wire [15:0] out2;
+  assign out1 = in1 * in1 * in1;
+  assign out2 = in1 * in3;
+endmodule
+
+test13
+input widths:
+  in1: 12
+  in10: -1
+  in11: -1
+  in12: -1
+  in13: -1
+  in14: -1
+  in15: -1
+  in2: 12
+  in3: -1
+  in4: -1
+  in5: -1
+  in6: -1
+  in7: 12
+  in8: -1
+  in9: -1
+output widths:
+  out1: -1
+  out2: -1
+  out3: -1
+  out4: -1
+  out5: -1
+Solving for out1:
+No solution
+Testing with control input in1
+in1: 0
+No solution
+Testing with control input in10
+in10: 0
+No solution
+Testing with control input in11
+in11: 0
+No solution
+Testing with control input in12
+in12: 0
+No solution
+Testing with control input in13
+in13: 0
+No solution
+Testing with control input in14
+in14: 0
+No solution
+Testing with control input in15
+in15: 0
+No solution
+Testing with control input in2
+in2: 0
+No solution
+Testing with control input in3
+in3: 0
+No solution
+Testing with control input in4
+in4: 0
+No solution
+Testing with control input in5
+in5: 0
+No solution
+Testing with control input in6
+in6: 0
+No solution
+Testing with control input in7
+in7: 0
+No solution
+Testing with control input in8
+in8: 0
+No solution
+Testing with control input in9
+in9: 0
+No solution
+Failed
+module top(in1, in10, in11, in12, in13, in14, in15, in2, in3, in4, in5, in6, in7, in8, in9, out1, out2, out3, out4, out5);
+  input [11:0] in1;
+  input in10;
+  input in11;
+  input in12;
+  input in13;
+  input in14;
+  input in15;
+  input [11:0] in2;
+  input in3;
+  input in4;
+  input in5;
+  input in6;
+  input [11:0] in7;
+  input in8;
+  input in9;
+  output out1;
+  output out2;
+  output out3;
+  output out4;
+  output out5;
+  wire [11:0] in1;
+  wire in10;
+  wire in11;
+  wire in12;
+  wire in13;
+  wire in14;
+  wire in15;
+  wire [11:0] in2;
+  wire in3;
+  wire in4;
+  wire in5;
+  wire in6;
+  wire [11:0] in7;
+  wire in8;
+  wire in9;
+  wire out1;
+  wire out2;
+  wire out3;
+  wire out4;
+  wire out5;
+
+test14
+input widths:
+  in1: 3
+  in2: 4
+  in3: 9
+output widths:
+  out1: -1
+Solving for out1:
+No solution
+Testing with control input in1
+in1: 0
+No solution
+Testing with control input in2
+in2: 0
+No solution
+Testing with control input in3
+in3: 0
+No solution
+Failed
+module top(in1, in2, in3, out1);
+  input [2:0] in1;
+  input [3:0] in2;
+  input [8:0] in3;
+  output out1;
+  wire [2:0] in1;
+  wire [3:0] in2;
+  wire [8:0] in3;
+  wire out1;
+
+test15
+test16
+input widths:
+  in1: 34
+  in2: 35
+  in3: 35
+  in4: 35
+output widths:
+  out1: -1
+  out2: -1
+  out3: -1
+  out4: -1
+Solving for out1:
+No solution
+Testing with control input in1
+Too many cases
+Testing with control input in2
+Too many cases
+Testing with control input in3
+Too many cases
+Testing with control input in4
+Too many cases
+Failed
+module top(in1, in2, in3, in4, out1, out2, out3, out4);
+  input [33:0] in1;
+  input [34:0] in2;
+  input [34:0] in3;
+  input [34:0] in4;
+  output out1;
+  output out2;
+  output out3;
+  output out4;
+  wire [33:0] in1;
+  wire [34:0] in2;
+  wire [34:0] in3;
+  wire [34:0] in4;
+  wire out1;
+  wire out2;
+  wire out3;
+  wire out4;
+
+test17
+input widths:
+  in1: 31
+  in2: 32
+  in3: 32
+output widths:
+  out1: 33
+  out2: -1
+  out3: -1
+  out4: 33
+  out5: -1
+  out6: -1
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+Solving for out2:
+No solution
+Testing with control input in1
+Too many cases
+Testing with control input in2
+Too many cases
+Testing with control input in3
+Too many cases
+Failed
+module top(in1, in2, in3, out1, out2, out3, out4, out5, out6);
+  input [30:0] in1;
+  input [31:0] in2;
+  input [31:0] in3;
+  output [32:0] out1;
+  output out2;
+  output out3;
+  output [32:0] out4;
+  output out5;
+  output out6;
+  wire [30:0] in1;
+  wire [31:0] in2;
+  wire [31:0] in3;
+  wire [32:0] out1;
+  wire out2;
+  wire out3;
+  wire [32:0] out4;
+  wire out5;
+  wire out6;
+  assign out1 = -2 + in2 - in1;
+
+test18
+input widths:
+  in1: 2
+  in2: 2
+  in3: 5
+  in4: 3
+  in5: 5
+  in6: 3
+output widths:
+  out1: 5
+  out2: -1
+  out3: 5
+  out4: -1
+  out5: 5
+Solving for out1:
+Solved
+Solved by Polynomial Coefficient Recovering
+Solving for out2:
+No solution
+Testing with control input in1
+in1: 0
+No solution
+Testing with control input in2
+in2: 0
+No solution
+Testing with control input in3
+in3: 0
+Solved
+in3: 1
+No solution
+Testing with control input in4
+in4: 0
+No solution
+Testing with control input in5
+in5: 0
+No solution
+Testing with control input in6
+in6: 0
+No solution
+Failed
+module top(in1, in2, in3, in4, in5, in6, out1, out2, out3, out4, out5);
+  input [1:0] in1;
+  input [1:0] in2;
+  input [4:0] in3;
+  input [2:0] in4;
+  input [4:0] in5;
+  input [2:0] in6;
+  output [4:0] out1;
+  output out2;
+  output [4:0] out3;
+  output out4;
+  output [4:0] out5;
+  wire [1:0] in1;
+  wire [1:0] in2;
+  wire [4:0] in3;
+  wire [2:0] in4;
+  wire [4:0] in5;
+  wire [2:0] in6;
+  wire [4:0] out1;
+  wire out2;
+  wire [4:0] out3;
+  wire out4;
+  wire [4:0] out5;
+  assign out1 = 1 + in2 - 5 * in1 - 4 * in1 * in1 + 8 * in1 * in1 * in1;
+
+test19
+input widths:
+  in1: -1
+  in10: -1
+  in11: -1
+  in12: -1
+  in13: -1
+  in14: -1
+  in15: -1
+  in16: -1
+  in17: -1
+  in18: -1
+  in19: -1
+  in2: 2
+  in20: -1
+  in21: -1
+  in22: -1
+  in23: -1
+  in24: -1
+  in25: -1
+  in26: -1
+  in27: -1
+  in28: -1
+  in29: -1
+  in3: -1
+  in30: -1
+  in31: -1
+  in32: -1
+  in33: -1
+  in34: -1
+  in35: -1
+  in36: -1
+  in37: -1
+  in38: -1
+  in39: -1
+  in4: -1
+  in40: -1
+  in41: -1
+  in42: -1
+  in43: -1
+  in44: -1
+  in45: -1
+  in46: -1
+  in47: -1
+  in48: -1
+  in49: -1
+  in5: 5
+  in50: -1
+  in51: -1
+  in52: -1
+  in53: -1
+  in54: -1
+  in55: -1
+  in56: -1
+  in57: -1
+  in58: -1
+  in59: -1
+  in6: -1
+  in60: -1
+  in61: -1
+  in62: -1
+  in63: -1
+  in64: -1
+  in65: -1
+  in66: -1
+  in67: -1
+  in68: -1
+  in69: -1
+  in7: -1
+  in70: -1
+  in71: -1
+  in72: -1
+  in73: -1
+  in74: -1
+  in75: -1
+  in76: -1
+  in77: -1
+  in78: -1
+  in79: -1
+  in8: 2
+  in80: -1
+  in81: -1
+  in82: -1
+  in83: -1
+  in84: -1
+  in85: -1
+  in86: -1
+  in87: -1
+  in88: -1
+  in89: -1
+  in9: -1
+  in90: -1
+output widths:
+  out1: 7
+  out10: 7
+  out11: 7
+  out12: 7
+  out13: 7
+  out14: 7
+  out15: 7
+  out16: 7
+  out17: 7
+  out18: 7
+  out19: 7
+  out2: 7
+  out20: 7
+  out21: 7
+  out22: 7
+  out23: 7
+  out24: 7
+  out25: 7
+  out26: 7
+  out27: 7
+  out28: 6
+  out29: 6
+  out3: 7
+  out30: 6
+  out31: 6
+  out32: 6
+  out33: 6
+  out34: 6
+  out35: 6
+  out36: 6
+  out37: 6
+  out38: 6
+  out39: 6
+  out4: 7
+  out40: 6
+  out41: 6
+  out42: 6
+  out43: 6
+  out5: 7
+  out6: 7
+  out7: 7
+  out8: 7
+  out9: 7
+Too many inputs
+module top(in1, in2, in3, in4, in5, in6, out1, out2, out3, out4, out5);
+  input [1:0] in1;
+  input [1:0] in2;
+  input [4:0] in3;
+  input [2:0] in4;
+  input [4:0] in5;
+  input [2:0] in6;
+  output [4:0] out1;
+  output out2;
+  output [4:0] out3;
+  output out4;
+  output [4:0] out5;
+  wire [1:0] in1;
+  wire [1:0] in2;
+  wire [4:0] in3;
+  wire [2:0] in4;
+  wire [4:0] in5;
+  wire [2:0] in6;
+  wire [4:0] out1;
+  wire out2;
+  wire [4:0] out3;
+  wire out4;
+  wire [4:0] out5;
+  assign out1 = 1 + in2 - 5 * in1 - 4 * in1 * in1 + 8 * in1 * in1 * in1;
+
+test20
+input widths:
+  in1: 9
+  in10: -1
+  in11: -1
+  in12: 9
+  in13: 8
+  in14: -1
+  in15: -1
+  in16: 9
+  in17: 8
+  in18: -1
+  in19: -1
+  in2: 8
+  in20: 9
+  in21: 8
+  in22: -1
+  in23: -1
+  in24: 9
+  in25: 8
+  in3: -1
+  in4: -1
+  in5: 7
+  in6: -1
+  in7: -1
+  in8: 9
+  in9: 8
+output widths:
+  out1: 17
+Too many inputs
+module top(in1, in2, in3, in4, in5, in6, out1, out2, out3, out4, out5);
+  input [1:0] in1;
+  input [1:0] in2;
+  input [4:0] in3;
+  input [2:0] in4;
+  input [4:0] in5;
+  input [2:0] in6;
+  output [4:0] out1;
+  output out2;
+  output [4:0] out3;
+  output out4;
+  output [4:0] out5;
+  wire [1:0] in1;
+  wire [1:0] in2;
+  wire [4:0] in3;
+  wire [2:0] in4;
+  wire [4:0] in5;
+  wire [2:0] in6;
+  wire [4:0] out1;
+  wire out2;
+  wire [4:0] out3;
+  wire out4;
+  wire [4:0] out5;
+  assign out1 = 1 + in2 - 5 * in1 - 4 * in1 * in1 + 8 * in1 * in1 * in1;
+
