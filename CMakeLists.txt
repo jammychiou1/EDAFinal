@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
 # TODO: Pack as an AppImage
 project(edafinal LANGUAGES CXX)
 
